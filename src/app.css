@@ -1,0 +1,180 @@
+:root {
+  color-scheme: light;
+  --window: #ececec;
+  --toolbar: rgba(246, 246, 246, 0.86);
+  --sidebar: #f4f4f6;
+  --canvas: #d9d9dc;
+  --card: rgba(0, 0, 0, 0.045);
+  --subcard: rgba(255, 255, 255, 0.72);
+  --control: #ffffff;
+  --control-hover: #f2f2f2;
+  --border: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --text: #1d1d1f;
+  --text-2: #6e6e73;
+  --text-3: #a1a1a6;
+  --fill-quaternary: rgba(0, 0, 0, 0.09);
+  --accent: #007aff;
+  --accent-soft: rgba(0, 122, 255, 0.1);
+  --orange: #f08c00;
+  --danger: #e5383b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  --material: rgba(250, 250, 252, 0.78);
+  --mono: ui-monospace, Menlo, Monaco, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --window: #1e1e1e;
+    --toolbar: rgba(40, 40, 40, 0.86);
+    --sidebar: #252527;
+    --canvas: #141415;
+    --card: rgba(255, 255, 255, 0.06);
+    --subcard: rgba(0, 0, 0, 0.24);
+    --control: #3a3a3c;
+    --control-hover: #444446;
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --text: #f5f5f7;
+    --text-2: #a1a1a6;
+    --text-3: #6e6e73;
+    --fill-quaternary: rgba(255, 255, 255, 0.1);
+    --accent: #0a84ff;
+    --accent-soft: rgba(10, 132, 255, 0.16);
+    --orange: #ff9f0a;
+    --danger: #ff453a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+    --material: rgba(44, 44, 46, 0.78);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --window: #1e1e1e;
+  --toolbar: rgba(40, 40, 40, 0.86);
+  --sidebar: #252527;
+  --canvas: #141415;
+  --card: rgba(255, 255, 255, 0.06);
+  --subcard: rgba(0, 0, 0, 0.24);
+  --control: #3a3a3c;
+  --control-hover: #444446;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #f5f5f7;
+  --text-2: #a1a1a6;
+  --text-3: #6e6e73;
+  --fill-quaternary: rgba(255, 255, 255, 0.1);
+  --accent: #0a84ff;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+  --orange: #ff9f0a;
+  --danger: #ff453a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+  --material: rgba(44, 44, 46, 0.78);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--window);
+  color: var(--text);
+  font: 13px/1.35 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100%;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--control);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) {
+  background: var(--control-hover);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn.small {
+  height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn.primary:hover:not(:disabled) {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+.btn.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.caption {
+  font-size: 12px;
+}
+.secondary {
+  color: var(--text-2);
+}
+.tertiary {
+  color: var(--text-3);
+}
+
+input[type='checkbox'].check {
+  accent-color: var(--accent);
+  margin: 0;
+}
+label.check-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

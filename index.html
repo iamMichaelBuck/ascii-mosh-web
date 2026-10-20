@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="ASCII Mosh — turn images into ASCII art, dithered retro graphics and datamoshed glitches, entirely in your browser." />
+    <meta name="theme-color" content="#ececec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>ASCII Mosh</title>
+    <script>
+      // Apply the saved appearance before first paint to avoid a light/dark flash.
+      try {
+        const m = localStorage.getItem('asciimosh.appearance');
+        if (m === 'light' || m === 'dark') document.documentElement.dataset.theme = m;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
