@@ -52,7 +52,7 @@
     display: flex;
     gap: 2px;
     height: 12px;
-    border-radius: 3px;
+    border-radius: calc(3px * var(--round));
     overflow: hidden;
   }
   .swatches span {

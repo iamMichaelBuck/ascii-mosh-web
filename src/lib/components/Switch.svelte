@@ -25,7 +25,7 @@
     height: var(--h);
     padding: 0;
     border: 0;
-    border-radius: 999px;
+    border-radius: calc(999px * var(--round));
     background: var(--fill-quaternary);
     box-shadow: inset 0 0 0 0.5px var(--border-strong);
     cursor: pointer;
@@ -44,9 +44,9 @@
     left: 1.5px;
     width: calc(var(--h) - 3px);
     height: calc(var(--h) - 3px);
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border-radius: calc(50% * var(--round));
+    background: var(--knob);
+    box-shadow: var(--knob-shadow);
     transition: transform 0.18s cubic-bezier(0.3, 0.7, 0.4, 1.1);
   }
   .switch[aria-checked='true'] .knob {

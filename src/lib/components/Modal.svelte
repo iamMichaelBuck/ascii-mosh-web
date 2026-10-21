@@ -28,10 +28,10 @@
     width: min(380px, calc(100vw - 32px));
     padding: 20px;
     border: 0;
-    border-radius: 12px;
+    border-radius: calc(12px * var(--round));
     background: var(--sidebar);
     color: var(--text);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 0.5px var(--border-strong);
+    box-shadow: var(--shadow-modal);
   }
   dialog[open] {
     animation: pop 0.16s cubic-bezier(0.3, 0.7, 0.4, 1.1);

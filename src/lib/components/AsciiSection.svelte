@@ -61,7 +61,7 @@
   }
   .chars {
     padding: 6px;
-    border-radius: 6px;
+    border-radius: calc(6px * var(--round));
     background: rgba(0, 0, 0, 0.25);
     overflow: hidden;
     display: -webkit-box;
@@ -76,7 +76,7 @@
     height: 24px;
     padding: 0 6px;
     border: 0;
-    border-radius: 5px;
+    border-radius: calc(5px * var(--round));
     background: var(--control);
     box-shadow: var(--shadow);
   }

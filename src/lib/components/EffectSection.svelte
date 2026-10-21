@@ -76,12 +76,12 @@
 <style>
   .effect {
     padding: 12px;
-    border-radius: 12px;
+    border-radius: calc(12px * var(--round));
     background: var(--card);
   }
   .effect.subsection {
     padding: 8px;
-    border-radius: 8px;
+    border-radius: calc(8px * var(--round));
     background: var(--subcard);
   }
   header {
@@ -133,7 +133,7 @@
     place-items: center;
     width: 16px;
     height: 16px;
-    border-radius: 50%;
+    border-radius: calc(50% * var(--round));
     background: var(--fill-quaternary);
     color: var(--text-2);
     font-size: 10px;
@@ -142,7 +142,7 @@
   }
   .reorder {
     display: flex;
-    border-radius: 5px;
+    border-radius: calc(5px * var(--round));
     box-shadow: var(--shadow);
     overflow: hidden;
   }

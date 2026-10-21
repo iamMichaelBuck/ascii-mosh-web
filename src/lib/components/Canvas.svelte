@@ -201,7 +201,7 @@
   canvas {
     grid-area: 1 / 1;
     display: block;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-image);
     will-change: transform;
     image-rendering: auto;
   }
@@ -221,7 +221,7 @@
     justify-content: center;
     gap: 12px;
     border: 2px dashed color-mix(in srgb, var(--text-2) 50%, transparent);
-    border-radius: 20px;
+    border-radius: calc(20px * var(--round));
     color: var(--text-2);
     text-align: center;
     padding: 16px;
@@ -246,7 +246,7 @@
     position: absolute;
     inset: 12px;
     border: 3px solid var(--accent);
-    border-radius: 16px;
+    border-radius: calc(16px * var(--round));
     background: var(--accent-soft);
     pointer-events: none;
   }
@@ -260,11 +260,11 @@
     gap: 10px;
     max-width: calc(100% - 24px);
     padding: 5px 12px;
-    border-radius: 999px;
+    border-radius: calc(999px * var(--round));
     background: var(--material);
     backdrop-filter: blur(20px) saturate(1.6);
     -webkit-backdrop-filter: blur(20px) saturate(1.6);
-    box-shadow: 0 0 0 0.5px var(--border-strong), 0 2px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-float);
     font-size: 11.5px;
     white-space: nowrap;
     cursor: default;
@@ -293,7 +293,7 @@
     height: 10px;
     border: 1.5px solid var(--text-3);
     border-top-color: var(--text);
-    border-radius: 50%;
+    border-radius: calc(50% * var(--round));
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin {

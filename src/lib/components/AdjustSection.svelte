@@ -31,7 +31,7 @@
   .hue-strip {
     height: 6px;
     margin: 0 7px;
-    border-radius: 3px;
+    border-radius: calc(3px * var(--round));
   }
   .row {
     display: flex;

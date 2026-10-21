@@ -4,7 +4,7 @@
   import Icon from './lib/components/Icon.svelte';
   import Modal from './lib/components/Modal.svelte';
   import Sidebar from './lib/components/Sidebar.svelte';
-  import { EditorState, type AppearanceMode } from './lib/editor.svelte';
+  import { EditorState, INTERFACE_STYLES, type AppearanceMode, type InterfaceStyle } from './lib/editor.svelte';
 
   const editor = new EditorState();
   if (import.meta.env.DEV) (window as unknown as { editor: EditorState }).editor = editor;
@@ -19,6 +19,10 @@
     const root = document.documentElement;
     if (editor.appearance === 'system') delete root.dataset.theme;
     else root.dataset.theme = editor.appearance;
+  });
+
+  $effect(() => {
+    document.documentElement.dataset.skin = editor.interfaceStyle;
   });
 
   $effect(() => {
@@ -157,15 +161,24 @@
           <Icon name="zoomIn" />
         </button>
       </div>
-      <div class="group" role="radiogroup" aria-label="Appearance">
-        {#each appearanceModes as mode (mode.id)}
-          <button type="button" class="btn icon" class:active={editor.appearance === mode.id} role="radio"
-            aria-checked={editor.appearance === mode.id} title="{mode.title} (⇧⌘D toggles)" aria-label={mode.title}
-            onclick={() => editor.setAppearance(mode.id)}>
-            <Icon name={mode.icon} />
-          </button>
+      <select class="btn style-select" title="Interface style" aria-label="Interface style"
+        value={editor.interfaceStyle} onchange={(e) => editor.setInterfaceStyle(e.currentTarget.value as InterfaceStyle)}>
+        {#each INTERFACE_STYLES as style (style.id)}
+          <option value={style.id}>{style.title}</option>
         {/each}
-      </div>
+      </select>
+      <!-- Cyberpunk and Windows 95 have a fixed palette, so light/dark only applies to macOS. -->
+      {#if editor.interfaceStyle === 'mac'}
+        <div class="group" role="radiogroup" aria-label="Appearance">
+          {#each appearanceModes as mode (mode.id)}
+            <button type="button" class="btn icon" class:active={editor.appearance === mode.id} role="radio"
+              aria-checked={editor.appearance === mode.id} title="{mode.title} (⇧⌘D toggles)" aria-label={mode.title}
+              onclick={() => editor.setAppearance(mode.id)}>
+              <Icon name={mode.icon} />
+            </button>
+          {/each}
+        </div>
+      {/if}
       <button type="button" class="btn export" title="Save the full-resolution result as PNG (⌘S)"
         disabled={!editor.hasImage || editor.isExporting} onclick={() => editor.exportImage()}>
         <Icon name="share" /> <span class="label">Export</span>
@@ -262,7 +275,7 @@
   }
   .group {
     display: flex;
-    border-radius: 6px;
+    border-radius: calc(6px * var(--round));
     box-shadow: var(--shadow);
   }
   .group .btn {
@@ -270,13 +283,20 @@
     border-radius: 0;
   }
   .group .btn:first-child {
-    border-radius: 6px 0 0 6px;
+    border-radius: calc(6px * var(--round)) 0 0 calc(6px * var(--round));
   }
   .group .btn:last-child {
-    border-radius: 0 6px 6px 0;
+    border-radius: 0 calc(6px * var(--round)) calc(6px * var(--round)) 0;
   }
   .group .btn + .btn {
     border-left: 0.5px solid var(--border);
+  }
+  .style-select {
+    padding: 0 24px 0 10px;
+    appearance: none;
+    background: var(--control)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='10' viewBox='0 0 8 10'%3E%3Cpath d='M1 3.5 4 1l3 2.5M1 6.5 4 9l3-2.5' fill='none' stroke='%23888' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat right 8px center;
   }
   .side {
     grid-area: side;
@@ -305,7 +325,7 @@
     height: 28px;
     padding: 0 8px;
     border: 0;
-    border-radius: 6px;
+    border-radius: calc(6px * var(--round));
     background: var(--control);
     box-shadow: var(--shadow);
     color: var(--text);

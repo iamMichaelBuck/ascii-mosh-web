@@ -16,6 +16,23 @@ function loadAppearance(): AppearanceMode {
   }
 }
 
+export type InterfaceStyle = 'mac' | 'cyber' | 'win95';
+export const INTERFACE_STYLES: { id: InterfaceStyle; title: string }[] = [
+  { id: 'mac', title: 'macOS' },
+  { id: 'cyber', title: 'Cyberpunk' },
+  { id: 'win95', title: 'Windows 95' },
+];
+const STYLE_KEY = 'asciimosh.interfaceStyle';
+
+function loadInterfaceStyle(): InterfaceStyle {
+  try {
+    const v = localStorage.getItem(STYLE_KEY);
+    return INTERFACE_STYLES.some((s) => s.id === v) ? (v as InterfaceStyle) : 'cyber';
+  } catch {
+    return 'cyber';
+  }
+}
+
 export const ZOOM_MIN = 0.1;
 export const ZOOM_MAX = 64;
 
@@ -48,6 +65,7 @@ export class EditorState {
   isConfirmingReset = $state(false);
 
   appearance = $state<AppearanceMode>(loadAppearance());
+  interfaceStyle = $state<InterfaceStyle>(loadInterfaceStyle());
 
   hasImage = $derived(this.sourceImage !== null);
   isShowingOriginal = $derived(this.showOriginal || this.isPeekingOriginal);
@@ -240,6 +258,15 @@ export class EditorState {
     this.appearance = mode;
     try {
       localStorage.setItem(APPEARANCE_KEY, mode);
+    } catch {
+      // Not persisted; still applies for this session.
+    }
+  }
+
+  setInterfaceStyle(style: InterfaceStyle) {
+    this.interfaceStyle = style;
+    try {
+      localStorage.setItem(STYLE_KEY, style);
     } catch {
       // Not persisted; still applies for this session.
     }

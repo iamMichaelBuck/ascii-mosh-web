@@ -23,7 +23,7 @@
     height: 22px;
     padding: 0 22px 0 8px;
     border: 0;
-    border-radius: 5px;
+    border-radius: calc(5px * var(--round));
     background: var(--control)
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='10' viewBox='0 0 8 10'%3E%3Cpath d='M1 3.5 4 1l3 2.5M1 6.5 4 9l3-2.5' fill='none' stroke='%23888' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
       no-repeat right 7px center;

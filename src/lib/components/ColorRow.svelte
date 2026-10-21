@@ -21,7 +21,7 @@
     height: 20px;
     padding: 2px;
     border: 0;
-    border-radius: 5px;
+    border-radius: calc(5px * var(--round));
     background: var(--control);
     box-shadow: var(--shadow);
     cursor: pointer;
@@ -31,10 +31,10 @@
   }
   input::-webkit-color-swatch {
     border: 0;
-    border-radius: 3px;
+    border-radius: calc(3px * var(--round));
   }
   input::-moz-color-swatch {
     border: 0;
-    border-radius: 3px;
+    border-radius: calc(3px * var(--round));
   }
 </style>

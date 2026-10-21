@@ -170,7 +170,7 @@
     height: 18px;
     touch-action: none;
     cursor: default;
-    border-radius: 4px;
+    border-radius: calc(4px * var(--round));
     --w: calc(100% - var(--handle));
   }
   .rail,
@@ -178,7 +178,7 @@
     position: absolute;
     top: 7px;
     height: 4px;
-    border-radius: 2px;
+    border-radius: calc(2px * var(--round));
     left: calc(var(--handle) / 2);
   }
   .rail {
@@ -194,7 +194,7 @@
     top: 5px;
     width: 2px;
     height: 8px;
-    border-radius: 1px;
+    border-radius: calc(1px * var(--round));
     left: calc(var(--handle) / 2 + var(--w) * var(--d) - 1px);
     background: var(--text-2);
     opacity: 0.6;
@@ -204,10 +204,10 @@
     top: 2px;
     width: var(--handle);
     height: var(--handle);
-    border-radius: 50%;
+    border-radius: calc(50% * var(--round));
     left: calc(var(--w) * var(--t));
-    background: #fff;
-    box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+    background: var(--knob);
+    box-shadow: var(--knob-shadow);
     transition: transform 0.12s;
   }
   .dragging .knob {

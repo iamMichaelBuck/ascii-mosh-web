@@ -1,0 +1,396 @@
+/*
+ * Alternative interface styles, selected with <html data-skin="…">.
+ * macOS is the default and lives in app.css; these override its tokens and add the few
+ * structural touches (bevels, glow, title bars) that tokens alone can't express.
+ * Loaded after app.css so the token blocks win over the light/dark ones at equal specificity.
+ */
+
+/* MARK: Cyberpunk — green phosphor terminal */
+
+:root[data-skin='cyber'] {
+  color-scheme: dark;
+  --window: #030806;
+  --toolbar: rgba(3, 12, 7, 0.94);
+  --sidebar: #050d08;
+  --canvas: #010402;
+  --card: rgba(57, 255, 20, 0.035);
+  --subcard: rgba(0, 0, 0, 0.4);
+  --control: #06140b;
+  --control-hover: #0b2414;
+  --border: rgba(57, 255, 20, 0.22);
+  --border-strong: rgba(57, 255, 20, 0.45);
+  --text: #7dff9a;
+  --text-2: #3fbf62;
+  --text-3: #24763d;
+  --fill-quaternary: rgba(57, 255, 20, 0.14);
+  --accent: #39ff14;
+  --accent-soft: rgba(57, 255, 20, 0.14);
+  --orange: #ffcc00;
+  --danger: #ff2a6d;
+  --glow: 0 0 10px rgba(57, 255, 20, 0.45);
+  --shadow: 0 0 0 1px var(--border);
+  --material: rgba(3, 14, 8, 0.92);
+  --round: 0;
+  --font-ui: var(--mono);
+  --font-size-ui: 12px;
+  --on-accent: #011205;
+  --knob: #021006;
+  --knob-shadow: 0 0 0 1px var(--accent), var(--glow);
+  --shadow-image: 0 0 0 1px var(--border-strong), 0 0 48px rgba(57, 255, 20, 0.14);
+  --shadow-float: 0 0 0 1px var(--border-strong), 0 0 16px rgba(57, 255, 20, 0.15);
+  --shadow-menu: 0 0 0 1px var(--border-strong), 0 0 24px rgba(57, 255, 20, 0.18), 0 8px 30px rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 0 0 1px var(--accent), 0 0 48px rgba(57, 255, 20, 0.25);
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+:root[data-skin='cyber'] body {
+  text-shadow: 0 0 4px rgba(57, 255, 20, 0.35);
+  caret-color: var(--accent);
+}
+/* CRT scanlines and vignette over the whole window; never intercepts input. */
+:root[data-skin='cyber'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.45));
+}
+:root[data-skin='cyber'] ::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+  text-shadow: none;
+}
+
+:root[data-skin='cyber'] .toolbar {
+  border-bottom: 1px solid var(--border-strong);
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.12);
+}
+:root[data-skin='cyber'] .app-name {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+:root[data-skin='cyber'] .app-name::before {
+  content: '> ';
+}
+:root[data-skin='cyber'] .app-name::after {
+  content: '_';
+  animation: cyber-blink 1s steps(1) infinite;
+}
+@keyframes cyber-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+:root[data-skin='cyber'] .btn:hover:not(:disabled),
+:root[data-skin='cyber'] .btn.active {
+  box-shadow: 0 0 0 1px var(--accent), var(--glow);
+}
+:root[data-skin='cyber'] .btn.active {
+  color: var(--accent);
+}
+:root[data-skin='cyber'] .btn.primary,
+:root[data-skin='cyber'] .btn.danger {
+  text-shadow: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+:root[data-skin='cyber'] .btn.primary {
+  box-shadow: var(--glow);
+}
+
+:root[data-skin='cyber'] .side,
+:root[data-skin='cyber'] .effect:not(.subsection) {
+  border: 1px solid var(--border);
+}
+:root[data-skin='cyber'] .side {
+  border-width: 0 1px 0 0;
+}
+:root[data-skin='cyber'] .effect .title {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+:root[data-skin='cyber'] .effect:not(.subsection) > header .title::before {
+  content: '[';
+  color: var(--text-3);
+}
+:root[data-skin='cyber'] .effect:not(.subsection) > header .title::after {
+  content: ']';
+  color: var(--text-3);
+}
+
+:root[data-skin='cyber'] .stage {
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(rgba(57, 255, 20, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+:root[data-skin='cyber'] .dropzone {
+  border-color: var(--border-strong);
+}
+:root[data-skin='cyber'] .chars {
+  background: rgba(57, 255, 20, 0.05);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+:root[data-skin='cyber'] .switch[aria-checked='true'] {
+  box-shadow: var(--glow);
+}
+:root[data-skin='cyber'] .value.changed {
+  text-shadow: var(--glow);
+}
+:root[data-skin='cyber'] .fill {
+  box-shadow: var(--glow);
+}
+:root[data-skin='cyber'] .tick {
+  background: var(--accent);
+}
+:root[data-skin='cyber'] dialog::backdrop {
+  background: rgba(0, 8, 2, 0.7);
+}
+
+/* MARK: Windows 95 — beveled grey on a teal desktop */
+
+:root[data-skin='win95'] {
+  color-scheme: light;
+  --bevel-out: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  --bevel-in: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+  --groove: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #fff, inset -2px -2px #808080;
+  --title-bar: linear-gradient(90deg, #000080, #1084d0);
+  --window: #c0c0c0;
+  --toolbar: var(--title-bar);
+  --sidebar: #c0c0c0;
+  --canvas: #008080;
+  --card: transparent;
+  --subcard: transparent;
+  --control: #c0c0c0;
+  --control-hover: #c0c0c0;
+  --border: #808080;
+  --border-strong: #808080;
+  --text: #000;
+  --text-2: #222;
+  --text-3: #808080;
+  --fill-quaternary: #dfdfdf;
+  --accent: #000080;
+  --accent-soft: rgba(0, 0, 128, 0.18);
+  --orange: #a04000;
+  --danger: #800000;
+  --shadow: var(--bevel-out);
+  --material: #c0c0c0;
+  --round: 0;
+  --font-ui: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', Arial, sans-serif;
+  --font-size-ui: 12px;
+  --on-accent: #fff;
+  --knob: #c0c0c0;
+  --knob-shadow: var(--bevel-out);
+  --shadow-image: 3px 3px 0 rgba(0, 0, 0, 0.5);
+  --shadow-float: var(--bevel-out);
+  --shadow-menu: var(--bevel-out), 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-modal: var(--bevel-out), 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+:root[data-skin='win95'] body {
+  -webkit-font-smoothing: none;
+}
+:root[data-skin='win95'] :focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+
+/* Title bar */
+:root[data-skin='win95'] .toolbar {
+  border-bottom: 2px solid #c0c0c0;
+}
+:root[data-skin='win95'] .toolbar .title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+:root[data-skin='win95'] .toolbar .group {
+  gap: 2px;
+  box-shadow: none;
+}
+:root[data-skin='win95'] .toolbar .group .btn {
+  box-shadow: var(--bevel-out);
+  border-left: 0 !important;
+}
+
+/* Buttons: raised, pressed when active or held */
+:root[data-skin='win95'] .btn {
+  color: #000;
+}
+:root[data-skin='win95'] .btn:active:not(:disabled),
+:root[data-skin='win95'] .btn.active {
+  box-shadow: var(--bevel-in) !important;
+}
+:root[data-skin='win95'] .btn.active {
+  background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
+  color: #000;
+}
+:root[data-skin='win95'] .btn.primary,
+:root[data-skin='win95'] .btn.danger {
+  background: #c0c0c0;
+  color: #000;
+  box-shadow: 0 0 0 1px #000, var(--bevel-out);
+}
+:root[data-skin='win95'] .btn.primary:hover:not(:disabled) {
+  background: #c0c0c0;
+  filter: none;
+}
+:root[data-skin='win95'] .btn:disabled,
+:root[data-skin='win95'] .reorder button:disabled {
+  opacity: 1;
+  color: #808080;
+  text-shadow: 1px 1px #fff;
+}
+
+/* Fields: sunken white wells */
+:root[data-skin='win95'] .text-input,
+:root[data-skin='win95'] .chars-input,
+:root[data-skin='win95'] .chars,
+:root[data-skin='win95'] .picker select,
+:root[data-skin='win95'] .color-row input {
+  background-color: #fff;
+  box-shadow: var(--bevel-in);
+}
+:root[data-skin='win95'] .picker select {
+  padding-left: 6px;
+}
+
+/* Effect sections look like group boxes */
+:root[data-skin='win95'] .side {
+  border-right: 0;
+  box-shadow: inset -1px 0 #808080, inset -2px 0 #fff;
+}
+:root[data-skin='win95'] .effect {
+  box-shadow: var(--groove);
+}
+:root[data-skin='win95'] .label {
+  font-weight: 700;
+}
+:root[data-skin='win95'] .subsection .label {
+  font-weight: 400;
+}
+:root[data-skin='win95'] .position {
+  background: #fff;
+  box-shadow: var(--bevel-in);
+  color: #000;
+}
+:root[data-skin='win95'] .reorder {
+  gap: 1px;
+  box-shadow: none;
+}
+:root[data-skin='win95'] .reorder button {
+  width: 18px;
+  box-shadow: var(--bevel-out);
+  border-left: 0 !important;
+}
+:root[data-skin='win95'] .reorder button:active:not(:disabled) {
+  box-shadow: var(--bevel-in);
+}
+
+/* Switches become checkboxes */
+:root[data-skin='win95'] .switch,
+:root[data-skin='win95'] .switch[aria-checked='true'] {
+  width: 13px;
+  height: 13px;
+  background: #fff center / 9px no-repeat;
+  box-shadow: var(--bevel-in);
+  transition: none;
+}
+:root[data-skin='win95'] .switch[aria-checked='true'] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E");
+}
+:root[data-skin='win95'] .switch .knob {
+  display: none;
+}
+
+/* Sliders become trackbars */
+:root[data-skin='win95'] .track .rail {
+  top: 7px;
+  height: 4px;
+  background: #fff;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
+}
+:root[data-skin='win95'] .track .fill {
+  display: none;
+}
+:root[data-skin='win95'] .track .knob {
+  top: 0;
+  height: 18px;
+  transform: none !important;
+}
+:root[data-skin='win95'] .tick {
+  background: #000;
+  opacity: 1;
+}
+
+/* Desktop, windows and status bar */
+:root[data-skin='win95'] .dropzone {
+  max-width: 420px;
+  max-height: 300px;
+  border: 0;
+  background: #c0c0c0;
+  box-shadow: var(--bevel-out), 3px 3px 0 rgba(0, 0, 0, 0.4);
+  color: #000;
+}
+:root[data-skin='win95'] .dropzone.targeted {
+  background: #c0c0c0;
+  box-shadow: 0 0 0 2px #fff, var(--bevel-out);
+}
+:root[data-skin='win95'] .drop-overlay {
+  border: 2px dotted #fff;
+  background: rgba(0, 0, 128, 0.18);
+}
+:root[data-skin='win95'] .status,
+:root[data-skin='win95'] .menu {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:root[data-skin='win95'] .status {
+  padding: 4px 10px;
+}
+:root[data-skin='win95'] .menu .group {
+  color: #808080;
+}
+:root[data-skin='win95'] .menu hr {
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+}
+
+:root[data-skin='win95'] dialog {
+  padding: 3px 3px 14px;
+}
+:root[data-skin='win95'] dialog h2 {
+  margin: 0 0 14px;
+  padding: 3px 6px;
+  background: var(--title-bar);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+:root[data-skin='win95'] dialog .body,
+:root[data-skin='win95'] dialog .actions {
+  padding: 0 12px;
+  color: #000;
+}
+:root[data-skin='win95'] dialog::backdrop {
+  background: transparent;
+}
+
+:root[data-skin='win95'] ::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+:root[data-skin='win95'] ::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
+}
+:root[data-skin='win95'] ::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  box-shadow: var(--bevel-out);
+}

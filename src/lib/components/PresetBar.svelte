@@ -82,11 +82,11 @@
     max-height: 60vh;
     overflow: auto;
     padding: 5px;
-    border-radius: 8px;
+    border-radius: calc(8px * var(--round));
     background: var(--material);
     backdrop-filter: blur(24px) saturate(1.6);
     -webkit-backdrop-filter: blur(24px) saturate(1.6);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25), 0 0 0 0.5px var(--border-strong);
+    box-shadow: var(--shadow-menu);
   }
   .group {
     padding: 4px 8px 2px;
@@ -103,7 +103,7 @@
     width: 100%;
     padding: 4px 8px;
     border: 0;
-    border-radius: 4px;
+    border-radius: calc(4px * var(--round));
     background: none;
     text-align: left;
     cursor: pointer;
@@ -111,13 +111,13 @@
   .item:hover,
   .item:focus-visible {
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     outline: none;
   }
   .delete {
     padding: 0 6px;
     border: 0;
-    border-radius: 4px;
+    border-radius: calc(4px * var(--round));
     background: none;
     color: var(--text-2);
     cursor: pointer;
