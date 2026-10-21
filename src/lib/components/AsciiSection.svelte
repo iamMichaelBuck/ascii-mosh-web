@@ -92,4 +92,10 @@
   .disabled {
     opacity: 0.5;
   }
+  @media (pointer: coarse) {
+    .chars-input {
+      height: 36px;
+      font-size: 16px;
+    }
+  }
 </style>

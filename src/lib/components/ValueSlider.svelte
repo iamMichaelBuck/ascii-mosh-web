@@ -27,7 +27,8 @@
   const fmt = (v: number) => v.toFixed(digits) + suffix;
 
   let track = $state<HTMLDivElement>();
-  let drag = $state<{ startValue: number; startX: number; onHandle: boolean; moved: boolean } | null>(null);
+  // `pending`: a touch that hasn't yet shown whether it is a horizontal drag or a vertical scroll.
+  let drag = $state<{ startValue: number; startX: number; startY: number; onHandle: boolean; moved: boolean; pending: boolean } | null>(null);
   let lastHandleClick = 0;
   let animate = $state(false);
 
@@ -51,9 +52,12 @@
     const rect = track!.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const handleX = HANDLE / 2 + trackWidth() * t;
-    const onHandle = Math.abs(x - handleX) <= HANDLE * 0.75;
+    const touch = e.pointerType === 'touch';
+    const onHandle = Math.abs(x - handleX) <= HANDLE * (touch ? 1.5 : 0.75);
+    drag = { startValue: value, startX: e.clientX, startY: e.clientY, onHandle, moved: false, pending: touch };
+    // Touches wait for the gesture's direction so swiping over a slider still scrolls the sidebar.
+    if (touch) return;
     if (!onHandle) setFraction((x - HANDLE / 2) / trackWidth());
-    drag = { startValue: value, startX: e.clientX, onHandle, moved: false };
     track!.setPointerCapture(e.pointerId);
     track!.focus();
     e.preventDefault();
@@ -62,6 +66,11 @@
   function onpointermove(e: PointerEvent) {
     if (!drag) return;
     const dx = e.clientX - drag.startX;
+    if (drag.pending) {
+      if (Math.abs(dx) < 6 || Math.abs(dx) <= Math.abs(e.clientY - drag.startY)) return;
+      drag.pending = false;
+      track!.setPointerCapture(e.pointerId);
+    }
     if (Math.abs(dx) >= 3) drag.moved = true;
     if (drag.onHandle) {
       setValue(drag.startValue + (dx / trackWidth()) * span);
@@ -71,10 +80,12 @@
     }
   }
 
-  function onpointerup() {
+  function onpointerup(e: PointerEvent) {
     if (!drag) return;
-    const { onHandle, moved } = drag;
+    const { onHandle, moved, pending } = drag;
     drag = null;
+    // A tap beside the handle jumps there, like a click does.
+    if (pending && !onHandle) setFraction((e.clientX - track!.getBoundingClientRect().left - HANDLE / 2) / trackWidth());
     if (!onHandle || moved) return;
     // A click without movement on the handle: check for a double-click.
     const now = performance.now();
@@ -168,7 +179,7 @@
   .track {
     position: relative;
     height: 18px;
-    touch-action: none;
+    touch-action: pan-y;
     cursor: default;
     border-radius: calc(4px * var(--round));
     --w: calc(100% - var(--handle));
@@ -216,5 +227,25 @@
   .animate .knob,
   .animate .fill {
     transition: left 0.2s cubic-bezier(0.3, 0.7, 0.4, 1), width 0.2s cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+
+  /* Taller hit area for fingers; the parts shift down to stay centered. */
+  @media (pointer: coarse) {
+    .track {
+      height: 32px;
+    }
+    .rail,
+    .fill {
+      top: 14px;
+    }
+    .tick {
+      top: 12px;
+    }
+    .knob {
+      top: 7px;
+      width: calc(var(--handle) + 4px);
+      height: calc(var(--handle) + 4px);
+      margin-left: -2px;
+    }
   }
 </style>

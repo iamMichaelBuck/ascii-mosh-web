@@ -14,7 +14,9 @@
 
   const displayed = $derived(editor.isShowingOriginal ? editor.proxyImage : (editor.previewImage ?? editor.proxyImage));
   const dims = $derived(displayed ? { w: displayed.width, h: displayed.height } : null);
-  const fit = $derived(dims ? Math.min(Math.max(1, width - 48) / dims.w, Math.max(1, height - 96) / dims.h) : 1);
+  // Margins around the fitted image leave room for the status pill; phones get tighter ones.
+  const margin = $derived(width < 560 ? { x: 16, y: 64 } : { x: 48, y: 96 });
+  const fit = $derived(dims ? Math.min(Math.max(1, width - margin.x) / dims.w, Math.max(1, height - margin.y) / dims.h) : 1);
   // Magnified dithers/ASCII stay crisp; downscaled photos stay smooth.
   const pixelated = $derived(fit * editor.zoom >= 1);
 

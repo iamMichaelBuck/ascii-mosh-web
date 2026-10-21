@@ -33,4 +33,10 @@
     cursor: pointer;
     text-overflow: ellipsis;
   }
+  @media (pointer: coarse) {
+    select {
+      height: 34px;
+      font-size: 14px;
+    }
+  }
 </style>

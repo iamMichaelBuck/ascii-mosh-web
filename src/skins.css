@@ -394,3 +394,20 @@
   background: #c0c0c0;
   box-shadow: var(--bevel-out);
 }
+
+/* Touch screens: the Windows 95 checkbox-switch and trackbar thumb grow with the other controls. */
+@media (pointer: coarse) {
+  :root[data-skin='win95'] .switch,
+  :root[data-skin='win95'] .switch[aria-checked='true'] {
+    width: 22px;
+    height: 22px;
+    background-size: 14px;
+  }
+  :root[data-skin='win95'] .track .rail {
+    top: 14px;
+  }
+  :root[data-skin='win95'] .track .knob {
+    top: 4px;
+    height: 24px;
+  }
+}

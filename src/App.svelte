@@ -25,6 +25,15 @@
     document.documentElement.dataset.skin = editor.interfaceStyle;
   });
 
+  // Tint Android Chrome's address bar to match the style; macOS keeps the light/dark values from index.html.
+  const STYLE_BAR_COLORS: Partial<Record<InterfaceStyle, string>> = { cyber: '#030806', win95: '#000080' };
+  $effect(() => {
+    for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+      meta.dataset.macColor ??= meta.content;
+      meta.content = STYLE_BAR_COLORS[editor.interfaceStyle] ?? meta.dataset.macColor;
+    }
+  });
+
   $effect(() => {
     document.title = editor.fileName ? `${editor.fileName} — ASCII Mosh` : 'ASCII Mosh';
   });
@@ -234,7 +243,7 @@
   .app {
     height: 100%;
     display: grid;
-    grid-template-columns: var(--sidebar-w) 0 1fr;
+    grid-template-columns: var(--sidebar-w) 0 minmax(0, 1fr);
     grid-template-rows: 44px 1fr;
     grid-template-areas:
       'toolbar toolbar toolbar'
@@ -331,10 +340,13 @@
     color: var(--text);
   }
 
+  /* Phones (Pixel 9–11: 410–448 CSS px wide). Canvas on top, controls scroll below. */
   @media (max-width: 760px) {
     .app {
-      grid-template-columns: 1fr;
-      grid-template-rows: 44px 52vh 1fr;
+      /* dvh tracks Chrome's collapsing address bar; minmax(0, …) stops wide content from stretching the column. */
+      height: 100dvh;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 44dvh) minmax(0, 1fr);
       grid-template-areas: 'toolbar' 'main' 'side';
     }
     .resizer {
@@ -343,16 +355,38 @@
     .side {
       border-right: 0;
       border-top: 0.5px solid var(--border-strong);
+      padding-bottom: env(safe-area-inset-bottom);
     }
     .toolbar {
-      padding: 0 8px 0 16px;
+      min-height: 48px;
+      padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+      gap: 8px;
+    }
+    .title {
+      flex: 1;
     }
     .tools {
-      gap: 4px;
+      flex: none;
+      gap: 6px;
     }
+    /* Pinch zooms and double-tap fits, so the zoom buttons only cost space here. */
     .export .label,
-    .group[role='radiogroup'] {
+    .group[role='radiogroup'],
+    .group[aria-label='Zoom'] {
       display: none;
+    }
+    .style-select {
+      max-width: 118px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .btn.icon {
+      width: 40px;
+    }
+    .text-input {
+      height: 40px;
+      font-size: 16px;
     }
   }
 </style>

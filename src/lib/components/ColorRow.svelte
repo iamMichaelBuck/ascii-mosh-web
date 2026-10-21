@@ -37,4 +37,10 @@
     border: 0;
     border-radius: calc(3px * var(--round));
   }
+  @media (pointer: coarse) {
+    input {
+      width: 44px;
+      height: 30px;
+    }
+  }
 </style>

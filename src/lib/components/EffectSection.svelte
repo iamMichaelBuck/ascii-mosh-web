@@ -173,4 +173,16 @@
   .content.dim {
     opacity: 0.45;
   }
+  @media (pointer: coarse) {
+    header {
+      gap: 8px;
+    }
+    .disclosure {
+      min-height: 36px;
+    }
+    .reorder button {
+      width: 34px;
+      height: 30px;
+    }
+  }
 </style>

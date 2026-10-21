@@ -52,4 +52,14 @@
   .switch[aria-checked='true'] .knob {
     transform: translateX(calc(var(--w) - var(--h)));
   }
+  @media (pointer: coarse) {
+    .switch {
+      --w: 44px;
+      --h: 26px;
+    }
+    .switch.small {
+      --w: 38px;
+      --h: 22px;
+    }
+  }
 </style>
