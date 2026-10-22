@@ -154,260 +154,118 @@
   background: rgba(0, 8, 2, 0.7);
 }
 
-/* MARK: Windows 95 — beveled grey on a teal desktop */
+/* MARK: Off-white — flat warm paper, square corners, hairline rules */
 
-:root[data-skin='win95'] {
+:root[data-skin='paper'] {
   color-scheme: light;
-  --bevel-out: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
-  --bevel-in: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
-  --groove: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #fff, inset -2px -2px #808080;
-  --title-bar: linear-gradient(90deg, #000080, #1084d0);
-  --window: #c0c0c0;
-  --toolbar: var(--title-bar);
-  --sidebar: #c0c0c0;
-  --canvas: #008080;
-  --card: transparent;
-  --subcard: transparent;
-  --control: #c0c0c0;
-  --control-hover: #c0c0c0;
-  --border: #808080;
-  --border-strong: #808080;
-  --text: #000;
-  --text-2: #222;
-  --text-3: #808080;
-  --fill-quaternary: #dfdfdf;
-  --accent: #000080;
-  --accent-soft: rgba(0, 0, 128, 0.18);
-  --orange: #a04000;
-  --danger: #800000;
-  --shadow: var(--bevel-out);
-  --material: #c0c0c0;
+  --window: #f4f1ea;
+  --toolbar: #f4f1ea;
+  --sidebar: #f7f5ef;
+  --canvas: #e9e5dc;
+  --card: #fbfaf6;
+  --subcard: #f4f1ea;
+  --control: #fdfcf9;
+  --control-hover: #f0ece3;
+  --border: #ddd7ca;
+  --border-strong: #c9c2b2;
+  --text: #24221d;
+  --text-2: #6b665b;
+  --text-3: #a39d90;
+  --fill-quaternary: #e4dfd4;
+  --accent: #24221d;
+  --accent-soft: rgba(36, 34, 29, 0.08);
+  --orange: #b4561f;
+  --danger: #a8322d;
+  --shadow: 0 0 0 1px var(--border);
+  --material: #fbfaf6;
   --round: 0;
-  --font-ui: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, 'Segoe UI', Arial, sans-serif;
-  --font-size-ui: 12px;
-  --on-accent: #fff;
-  --knob: #c0c0c0;
-  --knob-shadow: var(--bevel-out);
-  --shadow-image: 3px 3px 0 rgba(0, 0, 0, 0.5);
-  --shadow-float: var(--bevel-out);
-  --shadow-menu: var(--bevel-out), 2px 2px 0 rgba(0, 0, 0, 0.35);
-  --shadow-modal: var(--bevel-out), 3px 3px 0 rgba(0, 0, 0, 0.4);
+  --on-accent: #fbfaf6;
+  --knob: #fdfcf9;
+  --knob-shadow: 0 0 0 1px var(--text);
+  --shadow-image: 0 0 0 1px var(--border-strong), 6px 6px 0 rgba(36, 34, 29, 0.08);
+  --shadow-float: 0 0 0 1px var(--border-strong);
+  --shadow-menu: 0 0 0 1px var(--border-strong), 4px 4px 0 rgba(36, 34, 29, 0.08);
+  --shadow-modal: 0 0 0 1px var(--border-strong), 8px 8px 0 rgba(36, 34, 29, 0.1);
+  scrollbar-color: var(--border-strong) transparent;
 }
 
-:root[data-skin='win95'] body {
-  -webkit-font-smoothing: none;
-}
-:root[data-skin='win95'] :focus-visible {
-  outline: 1px dotted #000;
-  outline-offset: -4px;
+:root[data-skin='paper'] ::selection {
+  background: var(--text);
+  color: var(--on-accent);
 }
 
-/* Title bar */
-:root[data-skin='win95'] .toolbar {
-  border-bottom: 2px solid #c0c0c0;
+/* Hairline rules instead of shadows and translucency */
+:root[data-skin='paper'] .toolbar {
+  border-bottom: 1px solid var(--border-strong);
 }
-:root[data-skin='win95'] .toolbar .title {
-  color: #fff;
-  font-weight: 700;
-  font-size: 12px;
+:root[data-skin='paper'] .app-name {
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
-:root[data-skin='win95'] .toolbar .group {
-  gap: 2px;
+:root[data-skin='paper'] .side {
+  border-right: 1px solid var(--border-strong);
+}
+:root[data-skin='paper'] .effect {
+  box-shadow: 0 0 0 1px var(--border);
+}
+:root[data-skin='paper'] .effect.subsection {
   box-shadow: none;
+  border-left: 2px solid var(--border-strong);
 }
-:root[data-skin='win95'] .toolbar .group .btn {
-  box-shadow: var(--bevel-out);
-  border-left: 0 !important;
+:root[data-skin='paper'] .toolbar .group {
+  box-shadow: 0 0 0 1px var(--border);
 }
 
-/* Buttons: raised, pressed when active or held */
-:root[data-skin='win95'] .btn {
-  color: #000;
+/* Buttons: outlined, inverted when active */
+:root[data-skin='paper'] .btn:hover:not(:disabled) {
+  box-shadow: 0 0 0 1px var(--border-strong);
 }
-:root[data-skin='win95'] .btn:active:not(:disabled),
-:root[data-skin='win95'] .btn.active {
-  box-shadow: var(--bevel-in) !important;
+:root[data-skin='paper'] .btn.active {
+  background: var(--text);
+  color: var(--on-accent);
 }
-:root[data-skin='win95'] .btn.active {
-  background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
-  color: #000;
-}
-:root[data-skin='win95'] .btn.primary,
-:root[data-skin='win95'] .btn.danger {
-  background: #c0c0c0;
-  color: #000;
-  box-shadow: 0 0 0 1px #000, var(--bevel-out);
-}
-:root[data-skin='win95'] .btn.primary:hover:not(:disabled) {
-  background: #c0c0c0;
+:root[data-skin='paper'] .btn.primary:hover:not(:disabled) {
   filter: none;
-}
-:root[data-skin='win95'] .btn:disabled,
-:root[data-skin='win95'] .reorder button:disabled {
-  opacity: 1;
-  color: #808080;
-  text-shadow: 1px 1px #fff;
-}
-
-/* Fields: sunken white wells */
-:root[data-skin='win95'] .text-input,
-:root[data-skin='win95'] .chars-input,
-:root[data-skin='win95'] .chars,
-:root[data-skin='win95'] .picker select,
-:root[data-skin='win95'] .color-row input {
-  background-color: #fff;
-  box-shadow: var(--bevel-in);
-}
-:root[data-skin='win95'] .picker select {
-  padding-left: 6px;
-}
-
-/* Effect sections look like group boxes */
-:root[data-skin='win95'] .side {
-  border-right: 0;
-  box-shadow: inset -1px 0 #808080, inset -2px 0 #fff;
-}
-:root[data-skin='win95'] .effect {
-  box-shadow: var(--groove);
-}
-:root[data-skin='win95'] .label {
-  font-weight: 700;
-}
-:root[data-skin='win95'] .subsection .label {
-  font-weight: 400;
-}
-:root[data-skin='win95'] .position {
-  background: #fff;
-  box-shadow: var(--bevel-in);
-  color: #000;
-}
-:root[data-skin='win95'] .reorder {
-  gap: 1px;
-  box-shadow: none;
-}
-:root[data-skin='win95'] .reorder button {
-  width: 18px;
-  box-shadow: var(--bevel-out);
-  border-left: 0 !important;
-}
-:root[data-skin='win95'] .reorder button:active:not(:disabled) {
-  box-shadow: var(--bevel-in);
-}
-
-/* Switches become checkboxes */
-:root[data-skin='win95'] .switch,
-:root[data-skin='win95'] .switch[aria-checked='true'] {
-  width: 13px;
-  height: 13px;
-  background: #fff center / 9px no-repeat;
-  box-shadow: var(--bevel-in);
-  transition: none;
-}
-:root[data-skin='win95'] .switch[aria-checked='true'] {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E");
-}
-:root[data-skin='win95'] .switch .knob {
-  display: none;
-}
-
-/* Sliders become trackbars */
-:root[data-skin='win95'] .track .rail {
-  top: 7px;
-  height: 4px;
-  background: #fff;
-  box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
-}
-:root[data-skin='win95'] .track .fill {
-  display: none;
-}
-:root[data-skin='win95'] .track .knob {
-  top: 0;
-  height: 18px;
-  transform: none !important;
-}
-:root[data-skin='win95'] .tick {
   background: #000;
-  opacity: 1;
 }
 
-/* Desktop, windows and status bar */
-:root[data-skin='win95'] .dropzone {
-  max-width: 420px;
-  max-height: 300px;
-  border: 0;
-  background: #c0c0c0;
-  box-shadow: var(--bevel-out), 3px 3px 0 rgba(0, 0, 0, 0.4);
-  color: #000;
+/* Fields */
+:root[data-skin='paper'] .chars {
+  background: var(--subcard);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
-:root[data-skin='win95'] .dropzone.targeted {
-  background: #c0c0c0;
-  box-shadow: 0 0 0 2px #fff, var(--bevel-out);
+
+/* Sliders: thin rule with a square handle */
+:root[data-skin='paper'] .track .rail,
+:root[data-skin='paper'] .track .fill {
+  top: 8px;
+  height: 2px;
 }
-:root[data-skin='win95'] .drop-overlay {
-  border: 2px dotted #fff;
-  background: rgba(0, 0, 128, 0.18);
+:root[data-skin='paper'] .tick {
+  background: var(--text-2);
 }
-:root[data-skin='win95'] .status,
-:root[data-skin='win95'] .menu {
+
+/* Canvas, status bar, menus, dialogs */
+:root[data-skin='paper'] .dropzone {
+  border: 1px dashed var(--border-strong);
+}
+:root[data-skin='paper'] .dropzone.targeted {
+  border-color: var(--text);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+:root[data-skin='paper'] .drop-overlay {
+  border: 2px solid var(--text);
+  background: var(--accent-soft);
+}
+:root[data-skin='paper'] .status,
+:root[data-skin='paper'] .menu {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-:root[data-skin='win95'] .status {
-  padding: 4px 10px;
+:root[data-skin='paper'] .menu hr {
+  border-top: 1px solid var(--border);
 }
-:root[data-skin='win95'] .menu .group {
-  color: #808080;
-}
-:root[data-skin='win95'] .menu hr {
-  border-top: 1px solid #808080;
-  border-bottom: 1px solid #fff;
-}
-
-:root[data-skin='win95'] dialog {
-  padding: 3px 3px 14px;
-}
-:root[data-skin='win95'] dialog h2 {
-  margin: 0 0 14px;
-  padding: 3px 6px;
-  background: var(--title-bar);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-}
-:root[data-skin='win95'] dialog .body,
-:root[data-skin='win95'] dialog .actions {
-  padding: 0 12px;
-  color: #000;
-}
-:root[data-skin='win95'] dialog::backdrop {
-  background: transparent;
-}
-
-:root[data-skin='win95'] ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
-}
-:root[data-skin='win95'] ::-webkit-scrollbar-track {
-  background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
-}
-:root[data-skin='win95'] ::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
-  box-shadow: var(--bevel-out);
-}
-
-/* Touch screens: the Windows 95 checkbox-switch and trackbar thumb grow with the other controls. */
-@media (pointer: coarse) {
-  :root[data-skin='win95'] .switch,
-  :root[data-skin='win95'] .switch[aria-checked='true'] {
-    width: 22px;
-    height: 22px;
-    background-size: 14px;
-  }
-  :root[data-skin='win95'] .track .rail {
-    top: 14px;
-  }
-  :root[data-skin='win95'] .track .knob {
-    top: 4px;
-    height: 24px;
-  }
+:root[data-skin='paper'] dialog::backdrop {
+  background: rgba(244, 241, 234, 0.7);
 }

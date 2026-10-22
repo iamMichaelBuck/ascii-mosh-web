@@ -14,7 +14,7 @@
         const m = localStorage.getItem('asciimosh.appearance');
         if (m === 'light' || m === 'dark') document.documentElement.dataset.theme = m;
         const s = localStorage.getItem('asciimosh.interfaceStyle');
-        document.documentElement.dataset.skin = s === 'mac' || s === 'win95' ? s : 'cyber';
+        document.documentElement.dataset.skin = s === 'win95' ? 'paper' : s === 'mac' || s === 'paper' ? s : 'cyber';
       } catch {}
     </script>
   </head>

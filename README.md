@@ -25,7 +25,7 @@ npm run check    # svelte-check / TypeScript
 | `Views/*.swift`                   | `src/lib/components/*.svelte`, `App.svelte`|
 
 The toolbar's style picker switches between three interface styles: **Cyberpunk** (default, green phosphor terminal), **macOS**
-(follows light/dark) and **Windows 95**. Shared tokens live in `src/app.css` (macOS values); the other two
+(follows light/dark) and **Off-white** (flat warm paper with square corners). Shared tokens live in `src/app.css` (macOS values); the other two
 styles override them in `src/skins.css` via `<html data-skin="…">`.
 
 Live preview renders a ≤1600 px proxy; Export renders the full-resolution source in a separate

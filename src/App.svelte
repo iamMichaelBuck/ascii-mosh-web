@@ -26,7 +26,7 @@
   });
 
   // Tint Android Chrome's address bar to match the style; macOS keeps the light/dark values from index.html.
-  const STYLE_BAR_COLORS: Partial<Record<InterfaceStyle, string>> = { cyber: '#030806', win95: '#000080' };
+  const STYLE_BAR_COLORS: Partial<Record<InterfaceStyle, string>> = { cyber: '#030806', paper: '#f4f1ea' };
   $effect(() => {
     for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
       meta.dataset.macColor ??= meta.content;
@@ -176,7 +176,7 @@
           <option value={style.id}>{style.title}</option>
         {/each}
       </select>
-      <!-- Cyberpunk and Windows 95 have a fixed palette, so light/dark only applies to macOS. -->
+      <!-- Cyberpunk and Off-white have a fixed palette, so light/dark only applies to macOS. -->
       {#if editor.interfaceStyle === 'mac'}
         <div class="group" role="radiogroup" aria-label="Appearance">
           {#each appearanceModes as mode (mode.id)}

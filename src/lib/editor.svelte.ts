@@ -16,17 +16,18 @@ function loadAppearance(): AppearanceMode {
   }
 }
 
-export type InterfaceStyle = 'mac' | 'cyber' | 'win95';
+export type InterfaceStyle = 'mac' | 'cyber' | 'paper';
 export const INTERFACE_STYLES: { id: InterfaceStyle; title: string }[] = [
   { id: 'mac', title: 'macOS' },
   { id: 'cyber', title: 'Cyberpunk' },
-  { id: 'win95', title: 'Windows 95' },
+  { id: 'paper', title: 'Off-white' },
 ];
 const STYLE_KEY = 'asciimosh.interfaceStyle';
 
 function loadInterfaceStyle(): InterfaceStyle {
   try {
-    const v = localStorage.getItem(STYLE_KEY);
+    let v = localStorage.getItem(STYLE_KEY);
+    if (v === 'win95') v = 'paper'; // the Windows 95 style was replaced by Off-white
     return INTERFACE_STYLES.some((s) => s.id === v) ? (v as InterfaceStyle) : 'cyber';
   } catch {
     return 'cyber';
