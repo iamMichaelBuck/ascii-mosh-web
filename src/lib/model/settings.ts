@@ -110,7 +110,7 @@ export const DITHER_COLOR_MODES: Titled<DitherColorMode> = [
   { id: 'autoPalette', title: 'Adaptive palette' },
 ];
 
-export type DitherPalette = 'gameBoy' | 'cga' | 'ega' | 'c64' | 'pico8' | 'mac16' | 'zxSpectrum' | 'teletext' | 'gray4';
+export type DitherPalette = 'gameBoy' | 'cga' | 'ega' | 'c64' | 'pico8' | 'mac16' | 'zxSpectrum' | 'teletext' | 'cmy' | 'gray4';
 export const DITHER_PALETTES: readonly { id: DitherPalette; title: string; hex: number[] }[] = [
   { id: 'gameBoy', title: 'Game Boy (4)', hex: [0x0f380f, 0x306230, 0x8bac0f, 0x9bbc0f] },
   { id: 'cga', title: 'CGA Mode 4 (4)', hex: [0x000000, 0x55ffff, 0xff55ff, 0xffffff] },
@@ -125,6 +125,7 @@ export const DITHER_PALETTES: readonly { id: DitherPalette; title: string; hex: 
   { id: 'zxSpectrum', title: 'ZX Spectrum (15)', hex: [0x000000, 0x0000d7, 0xd70000, 0xd700d7, 0x00d700, 0x00d7d7, 0xd7d700, 0xd7d7d7,
     0x0000ff, 0xff0000, 0xff00ff, 0x00ff00, 0x00ffff, 0xffff00, 0xffffff] },
   { id: 'teletext', title: 'Teletext RGB/CMY (8)', hex: [0x000000, 0xff0000, 0x00ff00, 0xffff00, 0x0000ff, 0xff00ff, 0x00ffff, 0xffffff] },
+  { id: 'cmy', title: 'Cyan / Magenta / Yellow (5)', hex: [0xffffff, 0x00ffff, 0xff00ff, 0xffff00, 0x000000] },
   { id: 'gray4', title: 'Grayscale (4)', hex: [0x000000, 0x555555, 0xaaaaaa, 0xffffff] },
 ];
 export const paletteColors = (p: DitherPalette): RGBColor[] =>
