@@ -110,7 +110,7 @@
     }
 
     const key = e.key.toLowerCase();
-    const digit = /^Digit[1-4]$/.test(e.code) ? Number(e.code.slice(5)) : 0;
+    const digit = /^Digit[1-5]$/.test(e.code) ? Number(e.code.slice(5)) : 0;
     let handled = true;
 
     if (mod && !e.altKey && !e.shiftKey && key === 'o') editor.presentOpenPanel();
@@ -124,9 +124,9 @@
     else if (mod && e.altKey && e.code === 'Digit0' && editor.hasImage) editor.zoomToActualSize();
     else if (mod && e.code === 'Digit0' && editor.hasImage) editor.zoomToFit();
     else if (!mod && !typing && digit && !anyModalOpen()) {
-      // 1–4 (or ⌥1–4) toggle Adjust, Glitch, Dither, ASCII.
+      // 1–5 (or ⌥1–5) toggle Adjust, Glitch, Dither, ASCII, CRT.
       const s = editor.settings;
-      const target = [s.adjust, s.glitch, s.dither, s.ascii][digit - 1];
+      const target = [s.adjust, s.glitch, s.dither, s.ascii, s.crt][digit - 1];
       target.isEnabled = !target.isEnabled;
     } else if (!mod && !typing && e.code === 'KeyR' && !anyModalOpen()) editor.reseed();
     else if (!mod && !typing && e.code === 'KeyF' && !anyModalOpen()) editor.zoomToFit();

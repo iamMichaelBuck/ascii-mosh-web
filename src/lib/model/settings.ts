@@ -28,9 +28,9 @@ type Titled<T extends string> = readonly { id: T; title: string }[];
 // MARK: - Stages
 
 /** The movable stages. Adjust always runs first and is not part of the order. */
-export type EffectStage = 'glitch' | 'dither' | 'ascii';
-export const EFFECT_STAGES: EffectStage[] = ['glitch', 'dither', 'ascii'];
-export const STAGE_TITLES: Record<EffectStage, string> = { glitch: 'Glitch', dither: 'Dither', ascii: 'ASCII' };
+export type EffectStage = 'glitch' | 'dither' | 'ascii' | 'crt';
+export const EFFECT_STAGES: EffectStage[] = ['glitch', 'dither', 'ascii', 'crt'];
+export const STAGE_TITLES: Record<EffectStage, string> = { glitch: 'Glitch', dither: 'Dither', ascii: 'ASCII', crt: 'CRT' };
 
 // MARK: - Adjust
 
@@ -199,6 +199,29 @@ export type TearingSettings = GlitchSettings['tearing'];
 export type ChannelShiftSettings = GlitchSettings['channelShift'];
 export type DatabendSettings = GlitchSettings['databend'];
 
+// MARK: - CRT / scanlines
+
+export type PhosphorMask = 'apertureGrille' | 'shadowMask' | 'slotMask';
+export const PHOSPHOR_MASKS: Titled<PhosphorMask> = [
+  { id: 'apertureGrille', title: 'Aperture grille (Trinitron)' },
+  { id: 'shadowMask', title: 'Shadow mask (dot triads)' },
+  { id: 'slotMask', title: 'Slot mask' },
+];
+
+// Sizes are in pixels at the 1600 px reference size, so preview and export match.
+export const defaultCrt = () => ({
+  isEnabled: false,
+  scanlines: { isEnabled: true, spacing: 4, thickness: 0.5, intensity: 0.6, softness: 0.6, offset: 0, vertical: false },
+  mask: { isEnabled: false, type: 'apertureGrille' as PhosphorMask, size: 3, intensity: 0.3 },
+  glow: { isEnabled: false, radius: 4, strength: 0.35 },
+  screen: { isEnabled: false, curvature: 0.08, vignette: 0.35, brightness: 1.15 },
+});
+export type CrtSettings = ReturnType<typeof defaultCrt>;
+export type ScanlineSettings = CrtSettings['scanlines'];
+export type PhosphorMaskSettings = CrtSettings['mask'];
+export type GlowSettings = CrtSettings['glow'];
+export type ScreenSettings = CrtSettings['screen'];
+
 // MARK: - Render settings
 
 export interface RenderSettings {
@@ -207,13 +230,15 @@ export interface RenderSettings {
   glitch: GlitchSettings;
   dither: DitherSettings;
   ascii: AsciiSettings;
+  crt: CrtSettings;
 }
 export const defaultSettings = (): RenderSettings => ({
-  order: ['glitch', 'dither', 'ascii'],
+  order: ['glitch', 'dither', 'ascii', 'crt'],
   adjust: defaultAdjust(),
   glitch: defaultGlitch(),
   dither: defaultDither(),
   ascii: defaultAscii(),
+  crt: defaultCrt(),
 });
 
 /** `order` with duplicates removed and any missing stage appended, so a damaged preset still renders. */
@@ -275,6 +300,13 @@ export function sanitizeSettings(value: unknown): RenderSettings {
   g.tearing.maxHeight = clamp(g.tearing.maxHeight, 0.005, 0.3);
   g.databend.glitches = Math.round(clamp(g.databend.glitches, 1, 64));
   g.databend.chunkSize = clamp(g.databend.chunkSize, 0.001, 0.2);
+  const c = s.crt;
+  c.scanlines.spacing = clamp(c.scanlines.spacing, 2, 24);
+  c.scanlines.thickness = clamp(c.scanlines.thickness, 0.1, 0.9);
+  c.mask.size = clamp(c.mask.size, 2, 12);
+  c.glow.radius = clamp(c.glow.radius, 1, 24);
+  c.screen.curvature = clamp(c.screen.curvature, 0, 0.3);
+  c.screen.brightness = clamp(c.screen.brightness, 0.5, 2);
   return s;
 }
 

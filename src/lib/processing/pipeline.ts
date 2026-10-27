@@ -1,6 +1,7 @@
 import { normalizedOrder, type RenderSettings } from '../model/settings';
 import { applyAdjust } from './adjust';
 import { renderAscii } from './ascii';
+import { applyCrt } from './crt';
 import { applyDither } from './dither';
 import { applyGlitch } from './glitch';
 import { bufferFrom, toCanvas, type PixelBuffer } from './pixelbuffer';
@@ -15,7 +16,7 @@ export interface PipelineResult {
   duration: number;
 }
 
-/** Adjust always runs first; Glitch, Dither and ASCII follow in `settings.order`. */
+/** Adjust always runs first; Glitch, Dither, ASCII and CRT follow in `settings.order`. */
 export function render(source: ImageBitmap, settings: RenderSettings): PipelineResult {
   const start = performance.now();
   let buffer: PixelBuffer | null = bufferFrom(source);
@@ -39,6 +40,9 @@ export function render(source: ImageBitmap, settings: RenderSettings): PipelineR
       asciiText = ascii.text;
       canvas = ascii.canvas;
       buffer = null;
+    } else if (stage === 'crt' && settings.crt.isEnabled) {
+      buffer = applyCrt(pixels(), settings.crt, unit);
+      canvas = null;
     }
   }
   return { canvas: canvas ?? toCanvas(buffer!), asciiText, duration: performance.now() - start };

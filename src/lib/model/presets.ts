@@ -63,6 +63,22 @@ export const BUILT_IN_PRESETS: SavedPreset[] = [
     s.glitch.rowShift.probability = 0.15;
     s.glitch.rowShift.maxShift = 0.05;
   }),
+  builtIn('crtScanlines', 'CRT Scanlines', (s) => {
+    s.adjust.contrast = 1.1;
+    s.adjust.saturation = 1.15;
+    s.crt.isEnabled = true;
+    s.crt.scanlines.spacing = 4;
+    s.crt.scanlines.intensity = 0.55;
+    s.crt.mask.isEnabled = true;
+    s.crt.mask.intensity = 0.25;
+    s.crt.glow.isEnabled = true;
+    s.crt.glow.radius = 5;
+    s.crt.glow.strength = 0.4;
+    s.crt.screen.isEnabled = true;
+    s.crt.screen.curvature = 0.06;
+    s.crt.screen.vignette = 0.3;
+    s.crt.screen.brightness = 1.2;
+  }),
   builtIn('glitchedText', 'Glitched Text', (s) => {
     // Demonstrates reordering: the ASCII image is torn and shifted afterwards.
     s.order = ['ascii', 'glitch', 'dither'];

@@ -46,7 +46,7 @@ worker. Rapid setting changes are coalesced (one render in flight + one pending)
 | Save preset | ⌥⌘S |
 | Peek at original | hold Space |
 | Zoom in / out / fit / 100 % | ⌘= / ⌘− / ⌘0 or F / ⌥⌘0 |
-| Toggle Adjust / Glitch / Dither / ASCII | 1 / 2 / 3 / 4 |
+| Toggle Adjust / Glitch / Dither / ASCII / CRT | 1 / 2 / 3 / 4 / 5 |
 | Reseed glitches | R |
 | Toggle dark mode | ⇧⌘D |
 
@@ -55,7 +55,7 @@ Sliders: double-click the handle (or press Delete) to reset to the default value
 
 ## Differences from the macOS app
 
-- `⌘1–4` and `⌘R` are reserved by browsers, so the effect toggles are `1–4` and reseed is `R`.
+- `⌘1–5` and `⌘R` are reserved by browsers, so the effect toggles are `1–5` and reseed is `R`.
 - The glitch RNG is a 32-bit SplitMix variant, so a given seed gives a different (but still stable) pattern than the Swift build.
 - Block-element glyphs (░▒▓ etc.) are stretched to fill each ASCII cell, so rows don't show gaps.
 - Presets saved in the Mac app (UserDefaults) are not shared with the web app (localStorage).

@@ -4,6 +4,7 @@
   import { STAGE_TITLES, type EffectStage } from '../model/settings';
   import AdjustSection from './AdjustSection.svelte';
   import AsciiSection from './AsciiSection.svelte';
+  import CrtSection from './CrtSection.svelte';
   import DitherSection from './DitherSection.svelte';
   import type { StageReorder } from './EffectSection.svelte';
   import GlitchSection from './GlitchSection.svelte';
@@ -30,6 +31,8 @@
         <GlitchSection bind:settings={editor.settings.glitch} reorder={reorder(stage)} reseed={editor.reseed} />
       {:else if stage === 'dither'}
         <DitherSection bind:settings={editor.settings.dither} reorder={reorder(stage)} />
+      {:else if stage === 'crt'}
+        <CrtSection bind:settings={editor.settings.crt} reorder={reorder(stage)} />
       {:else}
         <AsciiSection bind:settings={editor.settings.ascii} reorder={reorder(stage)} hasText={editor.asciiText !== null}
           copy={() => editor.copyAsciiText()} exportText={() => editor.exportAsciiText()} />
