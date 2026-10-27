@@ -38,6 +38,9 @@
     document.title = editor.fileName ? `${editor.fileName} — ASCII Mosh` : 'ASCII Mosh';
   });
 
+  // A shared preset link (#preset=…) applies on load, and again if another one is pasted into this tab.
+  editor.openShareLinkFromLocation();
+
   // MARK: Sidebar width (300…440, like the macOS split view)
 
   const WIDTH_KEY = 'asciimosh.sidebarWidth';
@@ -92,7 +95,8 @@
     (t.isContentEditable || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement ||
       (t instanceof HTMLInputElement && !['checkbox', 'radio', 'button', 'color', 'range'].includes(t.type)));
 
-  const anyModalOpen = () => editor.isSavingPreset || editor.isConfirmingReset || editor.errorMessage !== null;
+  const anyModalOpen = () =>
+    editor.isSavingPreset || editor.isConfirmingReset || editor.errorMessage !== null || editor.sharing !== null || editor.incomingPreset !== null;
 
   function onkeydown(e: KeyboardEvent) {
     const mod = e.metaKey || e.ctrlKey;
@@ -143,7 +147,8 @@
 </script>
 
 <!-- The key-up never arrives if the window loses focus while Space is held. -->
-<svelte:window {onkeydown} {onkeyup} {onpaste} onblur={() => (editor.isPeekingOriginal = false)} />
+<svelte:window {onkeydown} {onkeyup} {onpaste} onblur={() => (editor.isPeekingOriginal = false)}
+  onhashchange={() => editor.openShareLinkFromLocation()} />
 
 <div class="app" style:--sidebar-w="{sidebarWidth}px">
   <header class="toolbar">
@@ -228,6 +233,40 @@
     <button type="button" class="btn danger" onclick={() => { editor.resetAll(); editor.isConfirmingReset = false; }}>Reset</button>
   {/snippet}
 </Modal>
+
+<Modal bind:open={() => editor.sharing !== null, (v) => { if (!v) editor.sharing = null; }} title="Share “{editor.sharing?.name}”">
+  <p style="margin:0">
+    Anyone who opens this link gets these effect settings in ASCII Mosh. The link holds only the settings, never your
+    image.
+  </p>
+  <!-- svelte-ignore a11y_autofocus -->
+  <input class="text-input share-url" type="text" readonly value={editor.sharing?.url ?? ''} aria-label="Share link" autofocus
+    onfocus={(e) => e.currentTarget.select()} />
+  {#snippet actions()}
+    <button type="button" class="btn" onclick={() => (editor.sharing = null)}>Done</button>
+    {#if editor.canShareNatively}
+      <button type="button" class="btn" onclick={() => editor.shareNatively()}><Icon name="share" size={14} /> Share…</button>
+    {/if}
+    <button type="button" class="btn primary" onclick={() => editor.copyShareLink()}>
+      <Icon name="link" size={14} /> {editor.toast === 'Link copied' ? 'Copied' : 'Copy Link'}
+    </button>
+  {/snippet}
+</Modal>
+
+<Modal bind:open={() => editor.incomingPreset !== null, (v) => { if (!v) editor.incomingPreset = null; }} title="Shared preset applied">
+  <p style="margin:0">
+    The settings from the link, “{editor.incomingPreset?.name}”, are now active. Save them to My Presets to keep them
+    after you change things.
+  </p>
+  {#snippet actions()}
+    <button type="button" class="btn" onclick={() => (editor.incomingPreset = null)}>Not Now</button>
+    <button type="button" class="btn primary" onclick={() => editor.saveIncomingPreset()}>Save to My Presets</button>
+  {/snippet}
+</Modal>
+
+{#if editor.toast}
+  <div class="toast" role="status">{editor.toast}</div>
+{/if}
 
 <Modal
   bind:open={() => editor.errorMessage !== null, (v) => { if (!v) editor.errorMessage = null; }}
@@ -338,6 +377,35 @@
     background: var(--control);
     box-shadow: var(--shadow);
     color: var(--text);
+  }
+
+  .share-url {
+    font: 12px var(--mono);
+    text-overflow: ellipsis;
+  }
+  .toast {
+    position: fixed;
+    z-index: 50;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    max-width: calc(100vw - 32px);
+    padding: 8px 14px;
+    border-radius: calc(8px * var(--round));
+    background: var(--material);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    box-shadow: var(--shadow-menu);
+    color: var(--text);
+    font-size: 12.5px;
+    pointer-events: none;
+    animation: toast-in 0.18s ease-out;
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 6px);
+    }
   }
 
   /* Phones (Pixel 9–11: 410–448 CSS px wide). Canvas on top, controls scroll below. */

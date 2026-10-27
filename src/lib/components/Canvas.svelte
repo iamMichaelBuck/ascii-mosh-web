@@ -121,7 +121,7 @@
   function ondrop(e: DragEvent) {
     e.preventDefault();
     isTargeted = false;
-    if (!editor.openFiles(e.dataTransfer?.files)) editor.errorMessage = 'The dropped item is not an image.';
+    if (!editor.openFiles(e.dataTransfer?.files)) editor.errorMessage = 'The dropped item is not an image or a preset file.';
   }
 </script>
 

@@ -232,7 +232,62 @@ export function mergeDefaults<T>(defaults: T, value: unknown): T {
     for (const [k, d] of Object.entries(defaults)) out[k] = mergeDefaults(d, v[k]);
     return out as T;
   }
+  // JSON can carry 1e999 (Infinity); only finite numbers are accepted.
+  if (typeof defaults === 'number') return (typeof value === 'number' && Number.isFinite(value) ? value : defaults) as T;
   return (typeof value === typeof defaults ? value : defaults) as T;
+}
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+const clampColor = (c: RGBColor) => rgb(clamp(c.r, 0, 1), clamp(c.g, 0, 1), clamp(c.b, 0, 1));
+
+/**
+ * Settings from an untrusted source (file, link, storage) with every field type-checked, the order repaired, and the
+ * values that drive render cost or divide (sizes, counts, scales) held to the sliders' ranges so a crafted preset
+ * can't stall the worker.
+ */
+export function sanitizeSettings(value: unknown): RenderSettings {
+  const s = mergeDefaults(defaultSettings(), value);
+  s.order = normalizedOrder(s.order.filter((x) => typeof x === 'string'));
+
+  const a = s.ascii, d = s.dither, g = s.glitch;
+  a.columns = Math.round(clamp(a.columns, 10, 400));
+  a.lineSpacing = clamp(a.lineSpacing, 0.7, 1.6);
+  a.customCharacters = a.customCharacters.slice(0, 256);
+  a.foreground = clampColor(a.foreground);
+  a.background = clampColor(a.background);
+  d.levels = Math.round(clamp(d.levels, 2, 8));
+  d.autoColors = Math.round(clamp(d.autoColors, 2, 32));
+  d.pixelScale = Math.round(clamp(d.pixelScale, 1, 16));
+  d.dark = clampColor(d.dark);
+  d.light = clampColor(d.light);
+  g.seed = Math.round(clamp(g.seed, 1, 0xffffffff));
+  g.slitScan.frequency = clamp(g.slitScan.frequency, 0.5, 20);
+  g.displacement.noiseScale = clamp(g.displacement.noiseScale, 0.01, 0.5);
+  g.quant.quality = Math.round(clamp(g.quant.quality, 1, 100));
+  g.quant.blockScale = Math.round(clamp(g.quant.blockScale, 1, 8));
+  g.chroma.horizontal = Math.round(clamp(g.chroma.horizontal, 1, 32));
+  g.chroma.vertical = Math.round(clamp(g.chroma.vertical, 1, 32));
+  g.macroblock.blockSize = Math.round(clamp(g.macroblock.blockSize, 4, 64));
+  g.macroblock.iterations = Math.round(clamp(g.macroblock.iterations, 1, 6));
+  g.rowShift.minBand = Math.round(clamp(g.rowShift.minBand, 1, 200));
+  g.rowShift.maxBand = Math.round(clamp(g.rowShift.maxBand, 1, 400));
+  g.tearing.tears = Math.round(clamp(g.tearing.tears, 1, 40));
+  g.tearing.maxHeight = clamp(g.tearing.maxHeight, 0.005, 0.3);
+  g.databend.glitches = Math.round(clamp(g.databend.glitches, 1, 64));
+  g.databend.chunkSize = clamp(g.databend.chunkSize, 0.001, 0.2);
+  return s;
+}
+
+/** Only the fields of `value` that differ from `defaults` (arrays are compared whole), or `undefined` if none do. */
+export function diffFromDefaults(value: unknown, defaults: unknown): unknown {
+  if (deepEqual(value, defaults)) return undefined;
+  if (!value || !defaults || typeof value !== 'object' || typeof defaults !== 'object' || Array.isArray(defaults)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    const d = diffFromDefaults(v, (defaults as Record<string, unknown>)[k]);
+    if (d !== undefined) out[k] = d;
+  }
+  return out;
 }
 
 export function deepEqual(a: unknown, b: unknown): boolean {

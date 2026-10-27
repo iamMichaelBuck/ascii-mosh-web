@@ -30,7 +30,9 @@
           {#each editor.userPresets as preset (preset.id)}
             <div class="item-row">
               <button type="button" role="menuitem" class="item" onclick={() => { editor.applyPreset(preset); open = false; }}>{preset.name}</button>
-              <button type="button" class="delete" title="Delete “{preset.name}”" aria-label="Delete preset {preset.name}"
+              <button type="button" class="row-action" title="Share “{preset.name}” as a link" aria-label="Share preset {preset.name}"
+                onclick={() => { editor.sharePreset(preset); open = false; }}><Icon name="link" size={12} /></button>
+              <button type="button" class="row-action delete" title="Delete “{preset.name}”" aria-label="Delete preset {preset.name}"
                 onclick={() => editor.deletePreset(preset)}><Icon name="trash" size={12} /></button>
             </div>
           {/each}
@@ -40,6 +42,22 @@
         {#each BUILT_IN_PRESETS as preset (preset.id)}
           <button type="button" role="menuitem" class="item" onclick={() => { editor.applyPreset(preset); open = false; }}>{preset.name}</button>
         {/each}
+        <hr />
+        <div class="group">Share &amp; Export</div>
+        <button type="button" role="menuitem" class="item with-icon" onclick={() => { editor.sharePreset(); open = false; }}>
+          <Icon name="link" size={13} /> Share current settings…
+        </button>
+        <button type="button" role="menuitem" class="item with-icon" onclick={() => { editor.exportPresets('current'); open = false; }}>
+          <Icon name="save" size={13} /> Export current settings…
+        </button>
+        <button type="button" role="menuitem" class="item with-icon" disabled={!editor.userPresets.length}
+          title={editor.userPresets.length ? undefined : 'Save a preset first'}
+          onclick={() => { editor.exportPresets('mine'); open = false; }}>
+          <Icon name="save" size={13} /> Export my presets ({editor.userPresets.length})…
+        </button>
+        <button type="button" role="menuitem" class="item with-icon" onclick={() => { editor.presentImportPanel(); open = false; }}>
+          <Icon name="upload" size={13} /> Import presets…
+        </button>
       </div>
     {/if}
   </div>
@@ -54,12 +72,13 @@
 </div>
 
 <style>
+  /* The menu spans the whole bar (not just the Presets button) so it always fits the sidebar. */
   .preset-bar {
+    position: relative;
     display: flex;
     gap: 8px;
   }
   .menu-wrap {
-    position: relative;
     flex: 1;
     min-width: 0;
   }
@@ -78,7 +97,7 @@
     z-index: 20;
     top: calc(100% + 4px);
     left: 0;
-    min-width: 230px;
+    right: 0;
     max-height: 60vh;
     overflow: auto;
     padding: 5px;
@@ -101,6 +120,10 @@
     flex: 1;
     display: block;
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     padding: 4px 8px;
     border: 0;
     border-radius: calc(4px * var(--round));
@@ -108,13 +131,22 @@
     text-align: left;
     cursor: pointer;
   }
-  .item:hover,
+  .item.with-icon {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .item:hover:not(:disabled),
   .item:focus-visible {
     background: var(--accent);
     color: var(--on-accent);
     outline: none;
   }
-  .delete {
+  .item:disabled {
+    color: var(--text-3);
+    cursor: default;
+  }
+  .row-action {
     padding: 0 6px;
     border: 0;
     border-radius: calc(4px * var(--round));
@@ -122,8 +154,19 @@
     color: var(--text-2);
     cursor: pointer;
   }
+  .row-action:hover {
+    color: var(--accent);
+  }
   .delete:hover {
     color: var(--danger);
+  }
+  @media (pointer: coarse) {
+    .item {
+      padding: 10px 10px;
+    }
+    .row-action {
+      padding: 0 12px;
+    }
   }
   hr {
     margin: 4px 6px;

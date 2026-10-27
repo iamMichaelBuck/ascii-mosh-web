@@ -1,4 +1,4 @@
-import { defaultSettings, mergeDefaults, rgb, type RenderSettings } from './settings';
+import { defaultSettings, diffFromDefaults, rgb, sanitizeSettings, type RenderSettings } from './settings';
 
 /** A named snapshot of every effect setting, including the stage order and glitch seed. */
 export interface SavedPreset {
@@ -75,6 +75,102 @@ export const BUILT_IN_PRESETS: SavedPreset[] = [
   }),
 ];
 
+// MARK: - Export / import files
+
+/** A preset as it travels between machines: just a name and its settings. */
+export interface PresetData {
+  name: string;
+  settings: RenderSettings;
+}
+
+const FILE_FORMAT = 'ascii-mosh/presets';
+const FILE_VERSION = 1;
+const MAX_NAME_LENGTH = 80;
+const MAX_IMPORT = 500;
+
+export const PRESET_FILE_EXTENSION = '.asciimosh.json';
+
+function cleanName(value: unknown, fallback: string) {
+  const name = typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, MAX_NAME_LENGTH) : '';
+  return name || fallback;
+}
+
+/** A versioned JSON document holding one or more presets. */
+export function encodePresetFile(presets: PresetData[]): string {
+  return JSON.stringify(
+    { format: FILE_FORMAT, version: FILE_VERSION, presets: presets.map((p) => ({ name: p.name, settings: p.settings })) },
+    null,
+    2,
+  );
+}
+
+/**
+ * Reads an exported file. Also accepts a bare preset (`{name, settings}`), a list of them, or a bare settings object,
+ * so hand-written files work. Every value is type-checked against the defaults. Throws with a readable message.
+ */
+export function parsePresetFile(text: string): PresetData[] {
+  let doc: unknown;
+  try {
+    doc = JSON.parse(text);
+  } catch {
+    throw new Error('The file is not valid JSON.');
+  }
+  const obj = doc && typeof doc === 'object' ? (doc as Record<string, unknown>) : null;
+  if (obj?.format === FILE_FORMAT && typeof obj.version === 'number' && obj.version > FILE_VERSION) {
+    throw new Error('These presets were saved by a newer version of ASCII Mosh.');
+  }
+
+  const looksLikeSettings = (v: unknown) =>
+    !!v && typeof v === 'object' && ['adjust', 'glitch', 'dither', 'ascii', 'order'].some((k) => k in (v as object));
+  const entries: unknown[] = Array.isArray(doc) ? doc : Array.isArray(obj?.presets) ? (obj.presets as unknown[]) : [doc];
+
+  const presets = entries.slice(0, MAX_IMPORT).flatMap((entry, i): PresetData[] => {
+    const e = entry && typeof entry === 'object' ? (entry as Record<string, unknown>) : null;
+    const raw = e && looksLikeSettings(e.settings) ? e.settings : looksLikeSettings(e) ? e : null;
+    if (!raw) return [];
+    return [{ name: cleanName(e?.name, entries.length > 1 ? `Imported ${i + 1}` : 'Imported preset'), settings: sanitizeSettings(raw) }];
+  });
+  if (!presets.length) throw new Error('The file does not contain any ASCII Mosh presets.');
+  return presets;
+}
+
+// MARK: - Share links
+
+// The preset rides in the URL fragment, which browsers never send to the server.
+const SHARE_PARAM = 'preset';
+
+function toBase64Url(text: string) {
+  let binary = '';
+  for (const byte of new TextEncoder().encode(text)) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(data: string) {
+  const binary = atob(data.replace(/-/g, '+').replace(/_/g, '/'));
+  return new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+}
+
+/** A link to this app that applies `preset` when opened. Only settings that differ from the defaults are stored. */
+export function shareLink(preset: PresetData, base = location.href): string {
+  const payload = { v: FILE_VERSION, n: preset.name, s: diffFromDefaults(preset.settings, defaultSettings()) ?? {} };
+  const url = new URL(base);
+  url.hash = `${SHARE_PARAM}=${toBase64Url(JSON.stringify(payload))}`;
+  return url.href;
+}
+
+/** The preset carried by a share link's fragment (`#preset=…`), or `null` if there is none or it is unreadable. */
+export function readShareLink(hash: string): PresetData | null {
+  const data = new URLSearchParams(hash.replace(/^#/, '')).get(SHARE_PARAM);
+  if (!data || data.length > 20_000) return null;
+  try {
+    const payload = JSON.parse(fromBase64Url(data));
+    if (!payload || typeof payload !== 'object') return null;
+    return { name: cleanName(payload.n, 'Shared preset'), settings: sanitizeSettings(payload.s) };
+  } catch {
+    return null;
+  }
+}
+
 /** Persists user presets as JSON in localStorage. */
 export const PresetStorage = {
   key: 'asciimosh.savedPresets',
@@ -85,7 +181,7 @@ export const PresetStorage = {
       if (!Array.isArray(raw)) return [];
       return raw
         .filter((p) => p && typeof p.name === 'string')
-        .map((p) => ({ id: String(p.id ?? crypto.randomUUID()), name: p.name, settings: mergeDefaults(defaultSettings(), p.settings) }));
+        .map((p) => ({ id: String(p.id ?? crypto.randomUUID()), name: p.name, settings: sanitizeSettings(p.settings) }));
     } catch {
       return [];
     }

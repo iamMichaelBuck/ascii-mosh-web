@@ -28,6 +28,11 @@ The toolbar's style picker switches between three interface styles: **Cyberpunk*
 (follows light/dark) and **Off-white** (flat warm paper with square corners). Shared tokens live in `src/app.css` (macOS values); the other two
 styles override them in `src/skins.css` via `<html data-skin="…">`.
 
+**Presets** can be shared as a link (the settings ride in the URL fragment `#preset=…`, which is never sent to
+the server, and only values that differ from the defaults are stored) or exported/imported as `.asciimosh.json`
+files, from the Presets menu. Preset files can also be dropped onto the canvas. Everything imported is type-checked
+and clamped to the sliders' ranges (`sanitizeSettings` in `src/lib/model/settings.ts`).
+
 Live preview renders a ≤1600 px proxy; Export renders the full-resolution source in a separate
 worker. Rapid setting changes are coalesced (one render in flight + one pending), as in the Swift app.
 
