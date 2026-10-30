@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Punchcard Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ecebe6;
+    --panel: #f8f7f3;
+    --text: #1d1c1a;
+    --muted: #6d6a63;
+    --line: #d6d3ca;
+    --accent: #b5452b;
+    --stage: #2a2926;
+    --field: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161614; --panel: #1f1e1c; --text: #eceae4; --muted: #9a968d;
+      --line: #34322e; --accent: #e0714f; --stage: #0c0c0b; --field: #282724;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161614; --panel: #1f1e1c; --text: #eceae4; --muted: #9a968d;
+    --line: #34322e; --accent: #e0714f; --stage: #0c0c0b; --field: #282724;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.45 "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  .app { display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; }
+  aside {
+    background: var(--panel); border-right: 1px solid var(--line);
+    padding: 20px; display: flex; flex-direction: column; gap: 18px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  legend { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; padding: 0; }
+  textarea, select, input[type="text"] {
+    width: 100%; font: inherit; color: var(--text); background: var(--field);
+    border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px;
+  }
+  textarea { min-height: 130px; resize: vertical; text-transform: uppercase; }
+  label.row { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .seg button {
+    flex: 1; font: inherit; font-size: 12px; padding: 7px 4px; border: 0;
+    background: var(--field); color: var(--text); cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--panel); }
+  .swatches { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .swatch {
+    width: 26px; height: 26px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--text) 35%, transparent);
+    cursor: pointer; padding: 0;
+  }
+  .swatch[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+  input[type="color"] { width: 30px; height: 28px; border: 1px solid var(--line); border-radius: 4px; padding: 0; background: none; cursor: pointer; }
+  .inline { display: flex; gap: 10px; align-items: center; font-size: 13px; }
+  .btn {
+    font: inherit; font-size: 13px; padding: 9px 12px; border-radius: 4px; cursor: pointer;
+    border: 1px solid var(--text); background: var(--text); color: var(--panel);
+  }
+  .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn:hover { opacity: .85; }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .warn { font-size: 12px; color: var(--accent); min-height: 1em; }
+  main { padding: 28px; min-width: 0; }
+  .stats { color: var(--muted); font-size: 12px; margin-bottom: 14px; display: flex; gap: 18px; flex-wrap: wrap; }
+  .stage { background: var(--stage); border-radius: 8px; padding: 28px; display: flex; flex-direction: column; gap: 28px; }
+  .card-wrap { position: relative; }
+  .card-wrap svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
+  .stage.cut svg { background: #fff; filter: none; }
+  .stage.f96 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .card-tools { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .card-tools span { color: #8d8a83; font-size: 11px; margin-right: auto; align-self: center; }
+  .card-tools button {
+    font: inherit; font-size: 11px; padding: 4px 9px; border-radius: 3px; cursor: pointer;
+    background: transparent; color: #cfccc4; border: 1px solid #4a4843;
+  }
+  .card-tools button:hover { border-color: #cfccc4; }
+  .ref { margin-top: 28px; font-size: 12px; color: var(--muted); }
+  .ref summary { cursor: pointer; color: var(--text); }
+  .ref table { border-collapse: collapse; margin-top: 10px; }
+  .ref td { padding: 2px 10px 2px 0; }
+  .ref td:first-child { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px; }
+    main { padding: 16px; }
+    .stage { padding: 12px; gap: 16px; }
+  }
+  @media print {
+    @page { size: A4 landscape; margin: 12mm; }
+    body { background: #fff; }
+    aside, .stats, .card-tools, .ref { display: none !important; }
+    .app { display: block; }
+    main { padding: 0; }
+    .stage { background: none; padding: 0; gap: 8mm; display: block; }
+    .card-wrap { break-inside: avoid; margin-bottom: 8mm; }
+    .card-wrap svg { width: 187.325mm; filter: none; }
+    .stage.f96 { display: grid; grid-template-columns: repeat(3, 82.55mm); gap: 6mm; }
+    .stage.f96 .card-wrap { margin: 0; }
+    .stage.f96 .card-wrap svg { width: 82.55mm; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div>
+      <h1>Punch<span>card</span> Generator</h1>
+      <div class="sub" id="subtitle">IBM 80-column · Hollerith / 029 code</div>
+    </div>
+
+    <fieldset>
+      <legend>Card format</legend>
+      <div class="seg" id="format">
+        <button data-v="80" aria-pressed="true">80 col · 1 line</button>
+        <button data-v="96" aria-pressed="false">96 col · 3 lines</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Text</legend>
+      <textarea id="text" spellcheck="false">HELLO WORLD
+TYPOGRAPHY IS WHAT LANGUAGE LOOKS LIKE.</textarea>
+      <div class="seg" id="mode">
+        <button data-v="lines" aria-pressed="true" id="linesBtn">1 line = 1 card</button>
+        <button data-v="flow" aria-pressed="false">Flow text</button>
+      </div>
+      <label class="row"><input type="checkbox" id="translit" checked> Transliterate Ä Ö Ü ß → AE OE UE SS</label>
+      <label class="row"><input type="checkbox" id="seq"> Sequence numbers in cols 73–80</label>
+      <div class="warn" id="warn"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Card stock</legend>
+      <div class="swatches" id="cardSwatches"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ink</legend>
+      <div class="swatches" id="inkSwatches"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Holes</legend>
+      <div class="seg" id="holeShape">
+        <button data-v="rect" aria-pressed="true">Rect</button>
+        <button data-v="round" aria-pressed="false">Rounded</button>
+        <button data-v="circle" aria-pressed="false">Circle</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Print layers</legend>
+      <label class="row"><input type="checkbox" id="showInterp" checked> Interpreted text along top</label>
+      <label class="row"><input type="checkbox" id="showDigits" checked> Row digits / labels</label>
+      <label class="row"><input type="checkbox" id="showColNums" checked> Column numbers</label>
+      <label class="row"><input type="checkbox" id="showCorner" checked> Corner cut</label>
+      <label class="row"><input type="checkbox" id="outline"> Cut file (outlines only, for laser / plotter)</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Export</legend>
+      <div class="btns">
+        <button class="btn" id="dlSvgAll">All · SVG</button>
+        <button class="btn" id="dlPngAll">All · PNG</button>
+        <button class="btn ghost" id="print">Print 1:1</button>
+        <button class="btn ghost" id="theme">Theme</button>
+      </div>
+    </fieldset>
+  </aside>
+
+  <main>
+    <div class="stats" id="stats"></div>
+    <div class="stage" id="stage"></div>
+    <details class="ref">
+      <summary>Character code reference</summary>
+      <table id="refTable"></table>
+    </details>
+  </main>
+</div>
+
+<script>
+// ---------- Hollerith encoding (IBM 029 keypunch) ----------
+const ROWS = ['12', '11', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const CODE = { ' ': [] };
+for (let d = 0; d <= 9; d++) CODE[String(d)] = [String(d)];
+'ABCDEFGHI'.split('').forEach((c, i) => CODE[c] = ['12', String(i + 1)]);
+'JKLMNOPQR'.split('').forEach((c, i) => CODE[c] = ['11', String(i + 1)]);
+'STUVWXYZ'.split('').forEach((c, i) => CODE[c] = ['0', String(i + 2)]);
+Object.assign(CODE, {
+  '&': ['12'], '-': ['11'], '/': ['0', '1'],
+  '¢': ['12', '2', '8'], '.': ['12', '3', '8'], '<': ['12', '4', '8'], '(': ['12', '5', '8'], '+': ['12', '6', '8'], '|': ['12', '7', '8'],
+  '!': ['11', '2', '8'], '$': ['11', '3', '8'], '*': ['11', '4', '8'], ')': ['11', '5', '8'], ';': ['11', '6', '8'], '¬': ['11', '7', '8'],
+  ',': ['0', '3', '8'], '%': ['0', '4', '8'], '_': ['0', '5', '8'], '>': ['0', '6', '8'], '?': ['0', '7', '8'],
+  ':': ['2', '8'], '#': ['3', '8'], '@': ['4', '8'], "'": ['5', '8'], '=': ['6', '8'], '"': ['7', '8'],
+});
+// 96-column card (IBM System/3): six rows per tier, BA zone + 8421 digit,
+// derived from the 029 code: 12 → B A, 11 → B, 0 → A, digit punches summed in binary
+const TIER_ROWS = ['B', 'A', '8', '4', '2', '1'];
+function code96(ch) {
+  const p = CODE[ch];
+  if (!p) return [];
+  const on = new Set();
+  let n = 0;
+  p.forEach(r => {
+    if (r === '12') { on.add('B'); on.add('A'); }
+    else if (r === '11') on.add('B');
+    else if (r === '0') on.add('A');
+    else n += +r;
+  });
+  [8, 4, 2, 1].forEach(b => { if (n & b) on.add(String(b)); });
+  return TIER_ROWS.filter(r => on.has(r));
+}
+const TRANSLIT = { 'Ä': 'AE', 'Ö': 'OE', 'Ü': 'UE', 'ß': 'SS', 'ẞ': 'SS', '’': "'", '‘': "'", '“': '"', '”': '"', '„': '"', '–': '-', '—': '-', '…': '...' };
+
+// ---------- Card geometry (in mils: 1/1000 inch) ----------
+const FORMATS = {
+  80: { W: 7375, H: 3250, cols: 80, lines: 1, corner: 250, size: '187.3 × 82.6 mm',
+        sub: 'IBM 80-column · Hollerith / 029 code', hole: { w: 55, h: 125, r: 18, circle: 45 } },
+  96: { W: 3250, H: 2630, cols: 32, lines: 3, corner: 180, size: '82.6 × 66.8 mm',
+        sub: 'IBM 96-column · 3 tiers · BA8421 code', hole: { w: 36, h: 56, r: 12, circle: 22 } },
+};
+const colX = i => 251 + i * 87;
+const rowY = r => 250 + r * 250;
+const colX96 = i => 235 + i * 90;
+const tierY = (t, r) => 930 + t * 580 + r * 85;
+
+const CARD_COLORS = [
+  { name: 'Manila', c: '#efe2c2', ink: '#8b3a2b' },
+  { name: 'Ivory', c: '#f8f5ec', ink: '#2f5a85' },
+  { name: 'Salmon', c: '#f2c2b0', ink: '#6b2a1d' },
+  { name: 'Sky', c: '#c5dbea', ink: '#1f3f66' },
+  { name: 'Mint', c: '#cfe5cd', ink: '#2d5a30' },
+  { name: 'Canary', c: '#f4e48d', ink: '#6a4b12' },
+  { name: 'Black', c: '#1f1e1c', ink: '#efe9da' },
+];
+const INKS = ['#8b3a2b', '#2f5a85', '#2d5a30', '#1d1c1a', '#efe9da'];
+
+const state = {
+  format: '80', mode: 'lines', holeShape: 'rect',
+  card: CARD_COLORS[0].c, ink: CARD_COLORS[0].ink,
+};
+const $ = id => document.getElementById(id);
+const fmt = () => FORMATS[state.format];
+const punchesFor = ch => state.format === '96' ? code96(ch) : (CODE[ch] || []);
+
+// ---------- Text → cards ----------
+function normalize(str) {
+  let s = str.toUpperCase();
+  if ($('translit').checked) s = s.replace(/[ÄÖÜßẞ’‘“”„–—…]/g, ch => TRANSLIT[ch]);
+  return s.replace(/\t/g, ' ');
+}
+
+function buildCards() {
+  const f = fmt();
+  const width = state.format === '80' && $('seq').checked ? 72 : f.cols;
+  const raw = normalize($('text').value);
+  const unknown = new Set();
+  const clean = raw.replace(/[^\n]/g, ch => {
+    if (CODE[ch]) return ch;
+    unknown.add(ch);
+    return ' ';
+  });
+  const chunks = [];
+  const chunk = line => {
+    if (line.length === 0) { chunks.push(''); return; }
+    for (let i = 0; i < line.length; i += width) chunks.push(line.slice(i, i + width));
+  };
+  // word-wrap so words don't break across cards / tiers
+  const wrap = text => {
+    let cur = '';
+    text.split(' ').forEach(word => {
+      if (!word) return;
+      if (word.length > width) { if (cur) chunks.push(cur); cur = ''; chunk(word); return; }
+      if ((cur ? cur.length + 1 : 0) + word.length > width) { chunks.push(cur); cur = word; }
+      else cur = cur ? cur + ' ' + word : word;
+    });
+    if (cur) chunks.push(cur);
+  };
+  if (state.mode === 'flow') {
+    wrap(clean.replace(/\s+/g, ' ').trim());
+  } else {
+    const lines = clean.replace(/\n+$/, '').split('\n');
+    lines.forEach(line => state.format === '96' && line.trim() ? wrap(line.trim()) : chunk(line));
+  }
+  // group lines into cards: 1 per 80-column card, 3 per 96-column card
+  const cards = [];
+  for (let i = 0; i < chunks.length; i += f.lines) {
+    let s = chunks.slice(i, i + f.lines).map(t => t.padEnd(width, ' ')).join('').padEnd(width * f.lines, ' ');
+    if (width === 72) s += String((cards.length + 1) * 10).padStart(8, '0');
+    cards.push(s);
+  }
+  return { cards, unknown };
+}
+
+// ---------- SVG rendering ----------
+function holePath(cx, cy) {
+  const shape = state.holeShape;
+  const hole = fmt().hole;
+  if (shape === 'circle') {
+    const r = hole.circle;
+    return `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+  }
+  const x = cx - hole.w / 2, y = cy - hole.h / 2;
+  if (shape === 'round') {
+    const r = hole.r, w = hole.w - 2 * r, h = hole.h - 2 * r;
+    return `M${x + r} ${y}h${w}a${r} ${r} 0 0 1 ${r} ${r}v${h}a${r} ${r} 0 0 1 ${-r} ${r}h${-w}a${r} ${r} 0 0 1 ${-r} ${-r}v${-h}a${r} ${r} 0 0 1 ${r} ${-r}Z`;
+  }
+  return `M${x} ${y}h${hole.w}v${hole.h}h${-hole.w}Z`;
+}
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const glyph = ch => ch === ' ' ? '␣' : esc(ch);
+
+// 80-column card: one line of 80 characters, 12 rows
+function layout80(text, o) {
+  let d = '', printed = '', cols = '', titles = '';
+  for (let c = 0; c < 80; c++) {
+    const ch = text[c] || ' ';
+    const punches = CODE[ch] || [];
+    const x = colX(c);
+    punches.forEach(r => { d += holePath(x, rowY(ROWS.indexOf(r))); });
+
+    if (o.digits) {
+      for (let r = 2; r < 12; r++) {
+        if (punches.includes(ROWS[r])) continue;
+        printed += `<text x="${x}" y="${rowY(r) + 34}">${ROWS[r]}</text>`;
+      }
+    }
+    if (o.interp && ch !== ' ') {
+      printed += `<text x="${x}" y="150" font-size="100" font-weight="500">${esc(ch)}</text>`;
+    }
+    if (o.cols) {
+      cols += `<text x="${x}" y="${rowY(2) + 128}">${c + 1}</text><text x="${x}" y="${rowY(11) + 160}">${c + 1}</text>`;
+    }
+    titles += `<rect x="${x - 43.5}" y="0" width="87" height="3250" fill="transparent"><title>Col ${c + 1} · “${glyph(ch)}” · ${punches.length ? punches.join('-') : 'no punch'}</title></rect>`;
+  }
+  return { d, printed, cols, titles };
+}
+
+// 96-column card: three lines of 32 characters, printed on top, punched in three tiers
+function layout96(text, o) {
+  let d = '', printed = '', cols = '', titles = '';
+  for (let t = 0; t < 3; t++) {
+    if (o.digits) {
+      TIER_ROWS.forEach((label, r) => {
+        printed += `<text x="120" y="${tierY(t, r) + 17}" font-size="48">${label}</text>`;
+      });
+    }
+    for (let c = 0; c < 32; c++) {
+      const n = t * 32 + c;
+      const ch = text[n] || ' ';
+      const punches = code96(ch);
+      const x = colX96(c);
+      punches.forEach(r => { d += holePath(x, tierY(t, TIER_ROWS.indexOf(r))); });
+
+      if (o.interp && ch !== ' ') {
+        printed += `<text x="${x}" y="${250 + t * 200}" font-size="100" font-weight="500">${esc(ch)}</text>`;
+      }
+      if (o.cols) cols += `<text x="${x}" y="${tierY(t, 0) - 58}">${n + 1}</text>`;
+      titles += `<rect x="${x - 45}" y="${tierY(t, 0) - 42}" width="90" height="509" fill="transparent"><title>Col ${n + 1} · line ${t + 1} · “${glyph(ch)}” · ${punches.length ? punches.join('-') : 'no punch'}</title></rect>`;
+    }
+  }
+  return { d, printed, cols, titles };
+}
+
+function renderCard(text, index) {
+  const f = fmt();
+  const outline = $('outline').checked;
+  const corner = $('showCorner').checked;
+  const ink = outline ? '#000000' : state.ink;
+  const font = `font-family="IBM Plex Mono, ui-monospace, Menlo, monospace"`;
+  const o = { digits: $('showDigits').checked, cols: $('showColNums').checked, interp: $('showInterp').checked };
+  const { d: holes, printed, cols, titles } = (state.format === '96' ? layout96 : layout80)(text, o);
+
+  const d = (corner ? `M${f.corner} 0H${f.W}V${f.H}H0V${f.corner}Z` : `M0 0H${f.W}V${f.H}H0Z`) + holes;
+  const cardShape = outline
+    ? `<path d="${d}" fill="none" stroke="#ff0000" stroke-width="3" fill-rule="evenodd"/>`
+    : `<path d="${d}" fill="${state.card}" fill-rule="evenodd"/>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f.W} ${f.H}" width="${f.W * 0.0254}mm" height="${f.H * 0.0254}mm" data-index="${index}">
+${cardShape}
+<g fill="${ink}" ${font} text-anchor="middle">
+  <g font-size="62">${printed}</g>
+  <g font-size="30" opacity=".85">${cols}</g>
+</g>
+${outline ? '' : `<g class="hover">${titles}</g>`}
+</svg>`;
+}
+
+// ---------- UI ----------
+let current = [];
+function render() {
+  const { cards, unknown } = buildCards();
+  current = cards;
+  const stage = $('stage');
+  stage.classList.toggle('cut', $('outline').checked);
+  stage.classList.toggle('f96', state.format === '96');
+  $('subtitle').textContent = fmt().sub;
+  $('linesBtn').textContent = state.format === '96' ? '1 line = 1 tier' : '1 line = 1 card';
+  $('seq').disabled = state.format === '96';
+  stage.innerHTML = cards.map((t, i) => `
+    <div class="card-wrap">
+      ${renderCard(t, i)}
+      <div class="card-tools">
+        <span>Card ${String(i + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}</span>
+        <button data-dl="svg" data-i="${i}">SVG</button>
+        <button data-dl="png" data-i="${i}">PNG</button>
+      </div>
+    </div>`).join('');
+  const chars = cards.reduce((n, t) => n + t.replace(/ /g, '').length, 0);
+  const holes = cards.reduce((n, t) => n + [...t].reduce((m, ch) => m + punchesFor(ch).length, 0), 0);
+  $('stats').innerHTML = `<span>${cards.length} card${cards.length === 1 ? '' : 's'}</span><span>${chars} characters</span><span>${holes} holes</span><span>${fmt().size}</span>`;
+  $('warn').textContent = unknown.size
+    ? `Not punchable, left blank: ${[...unknown].map(c => c === ' ' ? '␣' : c).join(' ')}`
+    : '';
+}
+
+function exportSvg(i) {
+  return renderCard(current[i], i).replace(/<g class="hover">[\s\S]*?<\/g>\n/, '');
+}
+
+function download(name, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+function stackedSvg() {
+  const { W, H } = fmt();
+  const gap = 250;
+  const total = current.length * H + (current.length - 1) * gap;
+  const inner = current.map((_, i) => {
+    const body = exportSvg(i).replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    return `<g transform="translate(0 ${i * (H + gap)})">${body}</g>`;
+  }).join('\n');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${total}" width="${W / 1000 * 25.4}mm" height="${total / 1000 * 25.4}mm">${inner}</svg>`;
+}
+
+function svgToPng(svgText, scale = 0.3) {
+  return new Promise((resolve, reject) => {
+    const vb = svgText.match(/viewBox="0 0 (\d+) (\d+)"/);
+    const w = Math.round(+vb[1] * scale), h = Math.round(+vb[2] * scale);
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      cv.toBlob(resolve, 'image/png');
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+const fname = i => `punchcard-${String(i + 1).padStart(2, '0')}`;
+
+$('stage').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-dl]');
+  if (!b) return;
+  const i = +b.dataset.i;
+  if (b.dataset.dl === 'svg') download(fname(i) + '.svg', new Blob([exportSvg(i)], { type: 'image/svg+xml' }));
+  else download(fname(i) + '.png', await svgToPng(exportSvg(i)));
+});
+$('dlSvgAll').onclick = () => download('punchcards.svg', new Blob([stackedSvg()], { type: 'image/svg+xml' }));
+$('dlPngAll').onclick = async () => download('punchcards.png', await svgToPng(stackedSvg()));
+$('print').onclick = () => window.print();
+$('theme').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme
+    ? root.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+
+function segmented(id, key) {
+  const el = $(id);
+  el.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    state[key] = b.dataset.v;
+    render();
+  });
+}
+segmented('format', 'format');
+segmented('mode', 'mode');
+segmented('holeShape', 'holeShape');
+
+function swatches(id, list, onPick, getActive, customKey) {
+  const el = $(id);
+  const draw = () => {
+    el.innerHTML = list.map(s => `<button class="swatch" title="${s.name || s.c}" data-c="${s.c}" style="background:${s.c}" aria-pressed="${s.c === getActive()}"></button>`).join('')
+      + `<input type="color" value="${getActive()}" title="Custom">`;
+  };
+  draw();
+  el.addEventListener('click', e => {
+    const b = e.target.closest('.swatch');
+    if (!b) return;
+    onPick(list.find(s => s.c === b.dataset.c));
+    redrawSwatches();
+    render();
+  });
+  el.addEventListener('input', e => {
+    if (e.target.type !== 'color') return;
+    state[customKey] = e.target.value;
+    el.querySelectorAll('.swatch').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    render();
+  });
+  return draw;
+}
+const drawCards = swatches('cardSwatches', CARD_COLORS, s => { state.card = s.c; state.ink = s.ink; }, () => state.card, 'card');
+const drawInks = swatches('inkSwatches', INKS.map(c => ({ c })), s => { state.ink = s.c; }, () => state.ink, 'ink');
+function redrawSwatches() { drawCards(); drawInks(); }
+
+['text', 'translit', 'seq', 'showInterp', 'showDigits', 'showColNums', 'showCorner', 'outline']
+  .forEach(id => $(id).addEventListener('input', render));
+
+// reference table
+$('refTable').innerHTML = (() => {
+  const groups = [
+    ['0–9', '0123456789'], ['A–I', 'ABCDEFGHI'], ['J–R', 'JKLMNOPQR'], ['S–Z', 'STUVWXYZ'],
+    ['Symbols', `&-/.<(+|!$*);,%_>?:#@'="¢¬`],
+  ];
+  return `<tr><td></td><td style="color:var(--muted)">80 col</td><td style="color:var(--muted)">96 col</td></tr>` +
+    groups.map(([name, chars]) => `<tr><td colspan="3" style="padding-top:8px;color:var(--muted)">${name}</td></tr>` +
+    [...chars].map(c => `<tr><td>${esc(c)}</td><td>${CODE[c].join('-')}</td><td>${code96(c).join('-')}</td></tr>`).join('')).join('');
+})();
+
+render();
+</script>
+</body>
+</html>
